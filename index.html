@@ -467,7 +467,7 @@
     // ==========================================
     // 1. CONFIGURATION & STATE
     // ==========================================
-    // अपना Web App URL यहाँ पेस्ट करें:
+    // Yahan apna Google Apps Script Web App URL paste karein:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec"; 
 
     let liveStudents = [];
@@ -478,11 +478,24 @@
     let currentUser = null;
     let activeTest = null;
     let currentQIndex = 0;
-    let userAnswers = {};
+    let userAnswers = {}; // Stores { questionIndex: originalOptionIndex }
     let testTimerInterval = null;
     let remainingSeconds = 0;
     let localReviewData = null;
     let excelUploadedQuestions = [];
+
+    // Anti-Cheating Shuffled Exam State
+    let shuffledExamQuestions = [];
+
+    // Helper: Fisher-Yates Array Shuffle
+    function shuffleArray(array) {
+      let arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
     // Helper: Direct API POST
     async function postToGoogleSheet(payload) {
@@ -508,7 +521,6 @@
       if (spinner) spinner.classList.add('fa-spin');
 
       if (!GOOGLE_SCRIPT_URL) {
-        // Fallback to local if no sheet URL
         liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
         liveTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
         liveResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
@@ -528,7 +540,7 @@
           liveResults = data.results || [];
           liveNotice = data.notice || null;
 
-          // Check if current logged-in student still exists in sheet
+          // If current logged-in student was deleted from sheet, log them out
           if (currentUser && currentUser.role === 'student') {
             const exists = liveStudents.some(s => s.mobile === currentUser.mobile);
             if (!exists) {
@@ -699,7 +711,6 @@
         return;
       }
 
-      // Check against live sheet data
       if (liveStudents.some(s => String(s.mobile).trim() === mobile)) {
         showToast("यह मोबाइल नंबर पहले से पंजीकृत है!", true);
         return;
@@ -708,7 +719,6 @@
       const payload = { action: 'register', fullName, mobile, password };
       await postToGoogleSheet(payload);
 
-      // Add to local session & array
       liveStudents.push({ fullName, mobile, password });
       currentUser = { role: 'student', fullName, mobile };
       localStorage.setItem('copa_session', JSON.stringify(currentUser));
@@ -725,7 +735,6 @@
       const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value.trim();
 
-      // Ensure data is refreshed
       await refreshDataFromSheet();
 
       const matched = liveStudents.find(s => {
@@ -820,7 +829,7 @@
     }
 
     // ==========================================
-    // 7. CBT TEST ENGINE
+    // 7. CBT TEST ENGINE (ANTI-CHEATING SHUFFLE)
     // ==========================================
     function startTest(testId) {
       if (!currentUser || currentUser.role !== 'student') {
@@ -838,6 +847,22 @@
       currentQIndex = 0;
       userAnswers = {};
       remainingSeconds = activeTest.duration * 60;
+
+      // Prepare Shuffled Questions & Shuffled Options
+      let rawQuestions = activeTest.questions.map((qObj) => {
+        let mappedOptions = qObj.options.map((optText, origOptIdx) => ({
+          text: optText,
+          originalIndex: origOptIdx
+        }));
+
+        return {
+          q: qObj.q,
+          originalCorrectAns: qObj.ans,
+          shuffledOptions: shuffleArray(mappedOptions)
+        };
+      });
+
+      shuffledExamQuestions = shuffleArray(rawQuestions);
 
       document.getElementById('cbtTestTopic').innerText = activeTest.topic;
       document.getElementById('cbtTestTitle').innerText = activeTest.title;
@@ -866,18 +891,19 @@
     }
 
     function renderCurrentQuestion() {
-      const q = activeTest.questions[currentQIndex];
-      document.getElementById('cbtQuestionTracker').innerText = `प्रश्न ${currentQIndex + 1} / ${activeTest.questions.length}`;
-      document.getElementById('cbtQuestionText').innerText = q.q;
+      const currentItem = shuffledExamQuestions[currentQIndex];
+      document.getElementById('cbtQuestionTracker').innerText = `प्रश्न ${currentQIndex + 1} / ${shuffledExamQuestions.length}`;
+      document.getElementById('cbtQuestionText').innerText = currentItem.q;
 
       const optsContainer = document.getElementById('cbtOptionsContainer');
       optsContainer.innerHTML = "";
 
-      q.options.forEach((opt, idx) => {
-        const isSelected = userAnswers[currentQIndex] === idx;
+      currentItem.shuffledOptions.forEach((optObj, displayIdx) => {
+        const isSelected = userAnswers[currentQIndex] === optObj.originalIndex;
+
         const btn = document.createElement('button');
         btn.type = "button";
-        btn.onclick = () => selectOption(idx);
+        btn.onclick = () => selectOption(optObj.originalIndex);
         btn.className = `w-full text-left p-3.5 rounded-xl border text-sm font-medium transition flex items-center justify-between ${
           isSelected 
             ? "border-indigo-600 bg-indigo-50/70 text-indigo-900 font-semibold" 
@@ -887,8 +913,8 @@
           <div class="flex items-center gap-3">
             <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
               isSelected ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
-            }">${String.fromCharCode(65 + idx)}</span>
-            <span>${opt}</span>
+            }">${String.fromCharCode(65 + displayIdx)}</span>
+            <span>${optObj.text}</span>
           </div>
           ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-600"></i>' : ''}
         `;
@@ -896,13 +922,13 @@
       });
 
       document.getElementById('prevQuestionBtn').disabled = currentQIndex === 0;
-      const isLast = currentQIndex === activeTest.questions.length - 1;
+      const isLast = currentQIndex === shuffledExamQuestions.length - 1;
       document.getElementById('nextQuestionBtn').classList.toggle('hidden', isLast);
       document.getElementById('submitTestBtn').classList.toggle('hidden', !isLast);
     }
 
-    function selectOption(optIndex) {
-      userAnswers[currentQIndex] = optIndex;
+    function selectOption(originalOptIndex) {
+      userAnswers[currentQIndex] = originalOptIndex;
       renderCurrentQuestion();
     }
 
@@ -922,23 +948,36 @@
       clearInterval(testTimerInterval);
 
       let score = 0;
-      const questionsData = activeTest.questions;
-      questionsData.forEach((q, i) => {
-        if (userAnswers[i] === q.ans) score++;
+      const total = shuffledExamQuestions.length;
+
+      shuffledExamQuestions.forEach((qItem, i) => {
+        if (userAnswers[i] === qItem.originalCorrectAns) {
+          score++;
+        }
       });
 
-      const total = questionsData.length;
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
+      // Prepare local review data for Answer Key
       localReviewData = {
         testTitle: activeTest.title,
         topic: activeTest.topic,
-        questions: questionsData,
-        userAnswers: { ...userAnswers }
+        questions: shuffledExamQuestions.map(sq => ({
+          q: sq.q,
+          options: sq.shuffledOptions.map(o => o.text),
+          ans: sq.shuffledOptions.findIndex(o => o.originalIndex === sq.originalCorrectAns)
+        })),
+        userAnswers: {}
       };
 
-      // Check against live sheet results
+      shuffledExamQuestions.forEach((sq, i) => {
+        const origSelected = userAnswers[i];
+        if (origSelected !== undefined) {
+          localReviewData.userAnswers[i] = sq.shuffledOptions.findIndex(o => o.originalIndex === origSelected);
+        }
+      });
+
       const alreadySubmitted = liveResults.find(r => 
         String(r.mobile).trim() === String(currentUser.mobile).trim() && r.testTitle === activeTest.title
       );
@@ -974,7 +1013,9 @@
       switchView('result');
     }
 
+    // ==========================================
     // 8. ANSWER KEY REVIEW
+    // ==========================================
     function toggleAnswerReview() {
       const reviewBox = document.getElementById('answerReviewContainer');
       if (!reviewBox.classList.contains('hidden')) {
@@ -1036,7 +1077,7 @@
     }
 
     // ==========================================
-    // 9. STUDENT PROFILE (SYNC WITH SHEET)
+    // 9. STUDENT PROFILE
     // ==========================================
     function loadStudentProfile() {
       if (!currentUser) return;
@@ -1070,7 +1111,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN MATRIX (SYNC WITH SHEET)
+    // 10. ADMIN MATRIX
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
