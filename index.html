@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- SheetJS Library for Excel (.xlsx / .csv) Parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     body { font-family: 'Inter', 'Tiro Devanagari Hindi', sans-serif; background-color: #f8fafc; }
     .hindi-text { font-family: 'Tiro Devanagari Hindi', sans-serif; }
@@ -36,12 +38,10 @@
           <i class="fa-solid fa-house text-xs"></i> <span>होम</span>
         </button>
 
-        <!-- Student Protected Marks & Profile -->
         <button id="navProfileBtn" onclick="switchView('profile')" class="hidden text-sm font-medium hover:text-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-amber-300">
           <i class="fa-solid fa-chart-simple text-xs"></i> <span>मार्क्स & प्रोफाइल</span>
         </button>
 
-        <!-- Auth Status Button -->
         <div id="authContainer">
           <button onclick="openAuthModal('login')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
             लॉगिन / रजिस्टर
@@ -83,9 +83,7 @@
           <span id="testCountBadge" class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">0 टेस्ट उपलब्ध</span>
         </div>
 
-        <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <!-- Dynamically Injected Tests -->
-        </div>
+        <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
     </section>
 
@@ -107,7 +105,6 @@
           </div>
         </div>
 
-        <!-- Question Body -->
         <div class="p-6 sm:p-8">
           <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-3">
             <span id="cbtQuestionTracker">प्रश्न 1 / 5</span>
@@ -118,11 +115,8 @@
             प्रश्न लोड हो रहा है...
           </h3>
 
-          <div id="cbtOptionsContainer" class="space-y-3">
-            <!-- Dynamic Options -->
-          </div>
+          <div id="cbtOptionsContainer" class="space-y-3"></div>
 
-          <!-- Bottom Navigation Controls -->
           <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
             <button id="prevQuestionBtn" onclick="navigateQuestion(-1)" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">
               <i class="fa-solid fa-arrow-left mr-1"></i> पिछला
@@ -149,7 +143,6 @@
         <h2 id="resultTitle" class="text-2xl font-black text-slate-900 mb-1">शानदार प्रदर्शन!</h2>
         <p id="resultSubtitle" class="text-sm text-slate-500 mb-6">आपका टेस्ट परिणाम सफलतापूर्वक तैयार हो गया है</p>
 
-        <!-- Score Highlights -->
         <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mb-6">
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
             <span class="block text-xs text-slate-400 font-bold uppercase">प्राप्तांक</span>
@@ -182,7 +175,7 @@
         </div>
       </div>
 
-      <!-- 4. ANSWER REVIEW CONTAINER (HIDDEN BY DEFAULT) -->
+      <!-- ANSWER REVIEW -->
       <div id="answerReviewContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-left">
         <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
           <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
@@ -192,13 +185,11 @@
             <i class="fa-solid fa-xmark"></i> बंद करें
           </button>
         </div>
-        <div id="reviewQuestionsList" class="space-y-4">
-          <!-- Dynamic Review Cards -->
-        </div>
+        <div id="reviewQuestionsList" class="space-y-4"></div>
       </div>
     </section>
 
-    <!-- 5. STUDENT PROFILE VIEW -->
+    <!-- 4. STUDENT PROFILE VIEW -->
     <section id="profileView" class="hidden space-y-6 max-w-5xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
@@ -217,7 +208,6 @@
         </button>
       </div>
 
-      <!-- Student Results Table (No Mobile Number) -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
           <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
@@ -237,15 +227,13 @@
                 <th class="p-3.5 text-center">परिणाम</th>
               </tr>
             </thead>
-            <tbody id="studentResultsBody" class="divide-y divide-slate-100">
-              <!-- Dynamically Populated -->
-            </tbody>
+            <tbody id="studentResultsBody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- 6. ADMIN DASHBOARD VIEW -->
+    <!-- 5. ADMIN DASHBOARD VIEW -->
     <section id="adminView" class="hidden space-y-6">
       <div class="bg-slate-900 text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -260,7 +248,7 @@
         </div>
       </div>
 
-      <!-- Tab A: SPREADSHEET MATRIX (Row: Topic, Col: Student Name) -->
+      <!-- Tab A: SPREADSHEET MATRIX -->
       <div id="adminMatrixTab" class="space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -275,55 +263,117 @@
 
           <div class="overflow-x-auto max-h-[600px] border border-slate-200 rounded-xl">
             <table class="w-full text-sm border-collapse text-left" id="matrixTable">
-              <thead id="matrixHead" class="bg-slate-100 text-slate-700 text-xs uppercase font-bold sticky top-0 z-20">
-                <!-- Injected Headers -->
-              </thead>
-              <tbody id="matrixBody" class="divide-y divide-slate-200 bg-white">
-                <!-- Injected Rows -->
-              </tbody>
+              <thead id="matrixHead" class="bg-slate-100 text-slate-700 text-xs uppercase font-bold sticky top-0 z-20"></thead>
+              <tbody id="matrixBody" class="divide-y divide-slate-200 bg-white"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Tab B: ADD NEW TEST -->
-      <div id="adminAddTestTab" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-circle-plus text-indigo-600"></i> नया टेस्ट बनाएं (Dynamic Test Creator)
-        </h3>
-        <form id="createTestForm" onsubmit="handleCreateTest(event)" class="space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">विषय (Topic Name) *</label>
-              <input type="text" id="newTestTopic" required placeholder="उदा. JavaScript, MS Excel, HTML" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">टेस्ट का शीर्षक (Title) *</label>
-              <input type="text" id="newTestTitle" required placeholder="उदा. Unit 3 Special Assessment" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">समय (मिनट में) *</label>
-              <input type="number" id="newTestDuration" required min="1" max="180" value="10" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-            </div>
-          </div>
+      <!-- Tab B: ADD TEST (MANUAL + EXCEL UPLOAD) -->
+      <div id="adminAddTestTab" class="hidden space-y-6">
+        
+        <!-- Mode Switcher -->
+        <div class="flex gap-3 bg-slate-100 p-1.5 rounded-xl max-w-md">
+          <button type="button" onclick="switchTestCreationMode('manual')" id="modeBtnManual" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition">
+            <i class="fa-solid fa-pen mr-1"></i> 1. एक-एक प्रश्न टाइप करें
+          </button>
+          <button type="button" onclick="switchTestCreationMode('excel')" id="modeBtnExcel" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">
+            <i class="fa-solid fa-file-excel mr-1 text-emerald-600"></i> 2. Excel / CSV से अपलोड करें
+          </button>
+        </div>
 
-          <!-- Dynamic Questions Builder -->
-          <div class="border-t border-slate-100 pt-4">
-            <div class="flex items-center justify-between mb-3">
-              <h4 class="font-bold text-slate-800 text-sm">प्रश्न सेट (Questions)</h4>
-              <button type="button" onclick="addQuestionField()" class="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-100">
-                + एक और प्रश्न जोड़ें
+        <!-- 1. MANUAL TEST CREATION FORM -->
+        <div id="manualTestContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-circle-plus text-indigo-600"></i> नया टेस्ट बनाएं (Manual Entry)
+          </h3>
+          <form id="createTestForm" onsubmit="handleCreateTest(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">विषय (Topic Name) *</label>
+                <input type="text" id="newTestTopic" required placeholder="उदा. JavaScript, MS Excel, HTML" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">टेस्ट का शीर्षक (Title) *</label>
+                <input type="text" id="newTestTitle" required placeholder="उदा. Unit 3 Special Assessment" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">समय (मिनट में) *</label>
+                <input type="number" id="newTestDuration" required min="1" max="180" value="10" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-4">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="font-bold text-slate-800 text-sm">प्रश्न सेट (Questions)</h4>
+                <button type="button" onclick="addQuestionField()" class="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-100">
+                  + एक और प्रश्न जोड़ें
+                </button>
+              </div>
+              <div id="questionsBuilder" class="space-y-4"></div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100">
+              <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">
+                टेस्ट पब्लिश करें और होम पेज पर जोड़ें
               </button>
             </div>
-            <div id="questionsBuilder" class="space-y-4"></div>
-          </div>
+          </form>
+        </div>
 
-          <div class="pt-4 border-t border-slate-100">
-            <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition">
-              टेस्ट पब्लिश करें और होम पेज पर जोड़ें
+        <!-- 2. EXCEL / CSV BULK UPLOAD -->
+        <div id="excelTestContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-emerald-600"></i> Excel/CSV फ़ाइल से टेस्ट अपलोड करें
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">एक ही बार में कितने भी सवाल (50, 100+) सीधे एक्सेल शीट से अपलोड करें।</p>
+            </div>
+            <button onclick="downloadSampleExcel()" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> सैंपल Excel फ़ॉर्मेट डाउनलोड करें
             </button>
           </div>
-        </form>
+
+          <form id="excelUploadForm" onsubmit="handleExcelTestUpload(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">विषय (Topic Name) *</label>
+                <input type="text" id="excelTestTopic" required placeholder="उदा. NCVT Theory Exam" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">टेस्ट का शीर्षक (Title) *</label>
+                <input type="text" id="excelTestTitle" required placeholder="उदा. Full Mock Test - Set A" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">समय (मिनट में) *</label>
+                <input type="number" id="excelTestDuration" required min="1" max="180" value="30" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+              </div>
+            </div>
+
+            <!-- File Upload Area -->
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:bg-slate-50 transition cursor-pointer" onclick="document.getElementById('excelFileInput').click()">
+              <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="previewExcelFile(event)">
+              <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-slate-700" id="excelFileNameDisplay">Excel या CSV फ़ाइल यहाँ चुनें</p>
+              <p class="text-xs text-slate-400 mt-1">स्वीकृत फॉर्मेट: .xlsx, .xls, .csv</p>
+            </div>
+
+            <!-- Preview Card -->
+            <div id="excelPreviewStats" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 font-semibold flex items-center justify-between">
+              <span id="excelParsedCount">0 प्रश्न लोड हो चुके हैं।</span>
+              <span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> फ़ाइल सही है</span>
+            </div>
+
+            <button type="submit" id="btnSubmitExcel" disabled class="w-full bg-emerald-600 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition">
+              Excel टेस्ट पब्लिश करें और होम पेज पर जोड़ें
+            </button>
+          </form>
+        </div>
+
       </div>
 
       <!-- Tab C: NOTICE CONTROL -->
@@ -349,7 +399,7 @@
 
   </main>
 
-  <!-- AUTH MODAL (LOGIN & REGISTER) -->
+  <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
       <div class="p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
@@ -364,7 +414,7 @@
       </div>
 
       <div class="p-6">
-        <!-- 1. Student Login -->
+        <!-- Student Login -->
         <form id="studentLoginForm" onsubmit="handleStudentLogin(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">विद्यार्थी का नाम या मोबाइल नंबर *</label>
@@ -379,7 +429,7 @@
           </button>
         </form>
 
-        <!-- 2. Student Registration -->
+        <!-- Student Registration -->
         <form id="registerForm" onsubmit="handleRegister(event)" class="hidden space-y-4">
           <div class="bg-indigo-50 text-indigo-800 text-xs p-2.5 rounded-lg border border-indigo-100">
             सूचना: आपका <b>मोबाइल नंबर</b> यूनिक रहेगा (One-Time Registration)।
@@ -401,7 +451,7 @@
           </button>
         </form>
 
-        <!-- 3. Admin Login -->
+        <!-- Admin Login -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="hidden space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">एडमिन यूजरनेम *</label>
@@ -419,7 +469,7 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- TOAST -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toastContent" class="bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -428,10 +478,7 @@
   </div>
 
   <script>
-    // ==========================================
     // 1. CONFIGURATION & STATE
-    // ==========================================
-    // Yahan apna Google Apps Script Web App URL daalein:
     const GOOGLE_SCRIPT_URL = ""; 
 
     let currentUser = null;
@@ -442,13 +489,11 @@
     let testTimerInterval = null;
     let remainingSeconds = 0;
     let localReviewData = null;
+    let excelUploadedQuestions = [];
 
-    // Purane default tests hata diye gaye hain (khali rakha hai)
     const DEFAULT_TESTS = [];
 
-    // ==========================================
     // 2. INITIALIZATION
-    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedSession();
       initializeTestData();
@@ -469,9 +514,7 @@
       setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
     }
 
-    // ==========================================
     // 3. NAVIGATION CONTROLLER
-    // ==========================================
     function switchView(viewName) {
       ['homeView', 'testView', 'resultView', 'profileView', 'adminView'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
@@ -501,9 +544,7 @@
       }
     }
 
-    // ==========================================
-    // 4. AUTHENTICATION (STUDENT & ADMIN)
-    // ==========================================
+    // 4. AUTHENTICATION
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
       if (session) {
@@ -610,9 +651,7 @@
             showToast(json.message || "रजिस्ट्रेशन विफल रहा", true);
             return;
           }
-        } catch (err) {
-          console.warn("Sheet API connection issue, falling back to local storage");
-        }
+        } catch (err) {}
       }
 
       localStudents.push({ fullName, mobile, password, date: new Date().toLocaleDateString('en-IN') });
@@ -627,7 +666,7 @@
       switchView('home');
     }
 
-    // Student Login (Fixed Name or Mobile Comparison)
+    // Student Login
     async function handleStudentLogin(e) {
       e.preventDefault();
       const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
@@ -698,9 +737,7 @@
       switchView('home');
     }
 
-    // ==========================================
-    // 5. TEST MANAGEMENT & RENDERING
-    // ==========================================
+    // 5. TEST MANAGEMENT
     function initializeTestData() {
       const stored = localStorage.getItem('copa_custom_tests');
       const customTests = stored ? JSON.parse(stored) : [];
@@ -748,9 +785,7 @@
       });
     }
 
-    // ==========================================
-    // 6. CBT TEST ENGINE & ONE-TIME SCORE LOCK
-    // ==========================================
+    // 6. CBT ENGINE
     function startTest(testId) {
       if (!currentUser || currentUser.role !== 'student') {
         showToast("कृपया टेस्ट देने से पहले लॉगिन करें", true);
@@ -844,7 +879,7 @@
       }
     }
 
-    // Submit CBT Test + Lock First Attempt Score
+    // Submit CBT Test
     async function submitCBTTest() {
       clearInterval(testTimerInterval);
 
@@ -910,9 +945,7 @@
       switchView('result');
     }
 
-    // ==========================================
-    // 7. ANSWER KEY REVIEW (GALAT / SAHI CHECK)
-    // ==========================================
+    // 7. ANSWER KEY REVIEW
     function toggleAnswerReview() {
       const reviewBox = document.getElementById('answerReviewContainer');
       if (!reviewBox.classList.contains('hidden')) {
@@ -979,9 +1012,7 @@
       reviewBox.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ==========================================
-    // 8. STUDENT PROFILE (NO MOBILE NUMBER)
-    // ==========================================
+    // 8. STUDENT PROFILE
     function loadStudentProfile() {
       if (!currentUser) return;
       document.getElementById('profStudentName').innerText = currentUser.fullName;
@@ -1016,9 +1047,7 @@
       });
     }
 
-    // ==========================================
-    // 9. ADMIN MATRIX (ROW: TOPIC, COL: STUDENT)
-    // ==========================================
+    // 9. ADMIN MATRIX
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
       ['tabBtnMatrix', 'tabBtnAddTest', 'tabBtnNotice'].forEach(id => {
@@ -1107,9 +1136,27 @@
       });
     }
 
-    // ==========================================
-    // 10. ADMIN TEST CREATOR
-    // ==========================================
+    // 10. TEST CREATION: MANUAL & EXCEL UPLOAD
+    function switchTestCreationMode(mode) {
+      const btnManual = document.getElementById('modeBtnManual');
+      const btnExcel = document.getElementById('modeBtnExcel');
+      const conManual = document.getElementById('manualTestContainer');
+      const conExcel = document.getElementById('excelTestContainer');
+
+      if (mode === 'manual') {
+        btnManual.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition";
+        btnExcel.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition";
+        conManual.classList.remove('hidden');
+        conExcel.classList.add('hidden');
+      } else {
+        btnExcel.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-emerald-700 shadow-sm transition";
+        btnManual.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition";
+        conExcel.classList.remove('hidden');
+        conManual.classList.add('hidden');
+      }
+    }
+
+    // Manual Question Field
     function addQuestionField() {
       const container = document.getElementById('questionsBuilder');
       const qNum = container.children.length + 1;
@@ -1141,6 +1188,7 @@
       container.appendChild(card);
     }
 
+    // Handle Manual Creation
     function handleCreateTest(e) {
       e.preventDefault();
       const topic = document.getElementById('newTestTopic').value.trim();
@@ -1164,14 +1212,118 @@
         questions.push({ q: qText, options: [o0, o1, o2, o3], ans });
       });
 
-      const newTest = {
+      saveAndPublishTest({ id: "T_" + Date.now(), topic, title, duration, questions });
+      e.target.reset();
+      document.getElementById('questionsBuilder').innerHTML = "";
+    }
+
+    // EXCEL / CSV PARSER & UPLOAD
+    function downloadSampleExcel() {
+      const sampleData = [
+        ["Question", "OptionA", "OptionB", "OptionC", "OptionD", "Answer"],
+        ["कंप्यूटर की मुख्य मेमोरी कौन सी होती है?", "RAM", "ROM", "Hard Disk", "CD-ROM", "A"],
+        ["BIOS किस चिप में स्टोर होता है?", "SRAM", "DRAM", "ROM", "Cache", "C"],
+        ["HTML का पूरा नाम क्या है?", "Hyper Text Markup Language", "High Text Multi Language", "None", "All", "A"]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(sampleData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Questions");
+      XLSX.writeFile(wb, "COPA_Test_Sample_Format.xlsx");
+      showToast("सैंपल Excel फॉर्मेट डाउनलोड हो गया!");
+    }
+
+    function previewExcelFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('excelFileNameDisplay').innerText = `चुनी गई फ़ाइल: ${file.name}`;
+      const reader = new FileReader();
+
+      reader.onload = function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          if (rows.length <= 1) {
+            showToast("फ़ाइल खाली है या उसमें प्रश्न नहीं हैं!", true);
+            return;
+          }
+
+          excelUploadedQuestions = [];
+
+          // Row 0 is header, start from Row 1
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || !row[0]) continue; // Skip empty lines
+
+            const qText = String(row[0]).trim();
+            const oA = String(row[1] || '').trim();
+            const oB = String(row[2] || '').trim();
+            const oC = String(row[3] || '').trim();
+            const oD = String(row[4] || '').trim();
+            const rawAns = String(row[5] || 'A').trim().toUpperCase();
+
+            let ansIdx = 0;
+            if (rawAns === 'B' || rawAns === '2') ansIdx = 1;
+            else if (rawAns === 'C' || rawAns === '3') ansIdx = 2;
+            else if (rawAns === 'D' || rawAns === '4') ansIdx = 3;
+
+            excelUploadedQuestions.push({
+              q: qText,
+              options: [oA, oB, oC, oD],
+              ans: ansIdx
+            });
+          }
+
+          if (excelUploadedQuestions.length > 0) {
+            document.getElementById('excelPreviewStats').classList.remove('hidden');
+            document.getElementById('excelParsedCount').innerText = `${excelUploadedQuestions.length} प्रश्न सफलतापूर्वक पढ़े गए!`;
+            document.getElementById('btnSubmitExcel').disabled = false;
+            showToast(`${excelUploadedQuestions.length} प्रश्न लोड हो गए!`);
+          } else {
+            showToast("मान्य प्रश्न नहीं मिले! कृपया सैंपल फॉर्मेट देखें।", true);
+          }
+
+        } catch (err) {
+          showToast("फ़ाइल पढ़ने में त्रुटि हुई!", true);
+          console.error(err);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function handleExcelTestUpload(e) {
+      e.preventDefault();
+      if (excelUploadedQuestions.length === 0) {
+        showToast("कृपया पहले सही Excel फ़ाइल चुनें!", true);
+        return;
+      }
+
+      const topic = document.getElementById('excelTestTopic').value.trim();
+      const title = document.getElementById('excelTestTitle').value.trim();
+      const duration = parseInt(document.getElementById('excelTestDuration').value);
+
+      saveAndPublishTest({
         id: "T_" + Date.now(),
         topic,
         title,
         duration,
-        questions
-      };
+        questions: excelUploadedQuestions
+      });
 
+      e.target.reset();
+      document.getElementById('excelFileNameDisplay').innerText = "Excel या CSV फ़ाइल यहाँ चुनें";
+      document.getElementById('excelPreviewStats').classList.add('hidden');
+      document.getElementById('btnSubmitExcel').disabled = true;
+      excelUploadedQuestions = [];
+    }
+
+    // Common Save & Publish Controller
+    function saveAndPublishTest(newTest) {
       let customTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
       customTests.push(newTest);
       localStorage.setItem('copa_custom_tests', JSON.stringify(customTests));
@@ -1186,15 +1338,11 @@
       }
 
       initializeTestData();
-      showToast("नया टेस्ट जोड़ा गया! होम पेज पर रीडायरेक्ट किया जा रहा है");
-      e.target.reset();
-      document.getElementById('questionsBuilder').innerHTML = "";
+      showToast("नया टेस्ट सफलतापूर्वक पब्लिश हो गया! होम पेज पर रीडायरेक्ट हो रहे हैं...");
       switchView('home');
     }
 
-    // ==========================================
-    // 11. NOTICE BOARD CONTROLLER
-    // ==========================================
+    // 11. NOTICE BOARD
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
       const noticeText = document.getElementById('noticeText');
