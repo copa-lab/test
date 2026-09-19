@@ -276,10 +276,10 @@
           <div class="overflow-x-auto max-h-[600px] border border-slate-200 rounded-xl">
             <table class="w-full text-sm border-collapse text-left" id="matrixTable">
               <thead id="matrixHead" class="bg-slate-100 text-slate-700 text-xs uppercase font-bold sticky top-0 z-20">
-                <!-- Injected Headers: Topic | Student 1 | Student 2 ... -->
+                <!-- Injected Headers -->
               </thead>
               <tbody id="matrixBody" class="divide-y divide-slate-200 bg-white">
-                <!-- Injected Rows: Topic Names and Student Marks -->
+                <!-- Injected Rows -->
               </tbody>
             </table>
           </div>
@@ -431,46 +431,20 @@
     // ==========================================
     // 1. CONFIGURATION & STATE
     // ==========================================
-    // Paste your Google Web App URL inside the quotes:
+    // Yahan apna Google Apps Script Web App URL daalein:
     const GOOGLE_SCRIPT_URL = ""; 
 
-    let currentUser = null; // { role: 'student'|'admin', fullName, mobile }
+    let currentUser = null;
     let allAvailableTests = [];
     let activeTest = null;
     let currentQIndex = 0;
-    let userAnswers = {}; // { qIndex: selectedOptionIndex }
+    let userAnswers = {};
     let testTimerInterval = null;
     let remainingSeconds = 0;
-    let localReviewData = null; // Holds review info for post-test analysis
+    let localReviewData = null;
 
-    // Default Preloaded Tests (NCVT COPA)
-    const DEFAULT_TESTS = [
-      {
-        id: "T_DEF_1",
-        topic: "Computer Fundamentals",
-        title: "COPA CBT Test 1: Fundamentals & OS",
-        duration: 10,
-        questions: [
-          { q: "कंप्यूटर की मुख्य मेमोरी (Main Memory) कौन सी होती है?", options: ["RAM", "ROM", "Hard Disk", "CD-ROM"], ans: 0 },
-          { q: "ऑपरेटिंग सिस्टम किस प्रकार का सॉफ्टवेयर है?", options: ["Application", "System Software", "Utility", "Firmware"], ans: 1 },
-          { q: "विंडोज में एक फोल्डर बनाने का शॉर्टकट क्या है?", options: ["Ctrl + N", "Ctrl + Shift + N", "Alt + N", "Shift + F10"], ans: 1 },
-          { q: "BIOS किस मेमोरी चिप में स्टोर होता है?", options: ["SRAM", "DRAM", "ROM", "Cache"], ans: 2 },
-          { q: "FAT32 और NTFS किसके प्रकार हैं?", options: ["File System", "Hard Disk Type", "Network Protocol", "RAM Type"], ans: 0 }
-        ]
-      },
-      {
-        id: "T_DEF_2",
-        topic: "HTML & Web Authoring",
-        title: "COPA CBT Test 2: HTML Fundamentals",
-        duration: 10,
-        questions: [
-          { q: "HTML का पूरा रूप क्या है?", options: ["Hyper Text Markup Language", "High Text Multi Language", "Hyperlinks Text Mark Language", "None"], ans: 0 },
-          { q: "वेब पेज में सबसे बड़ी हेडिंग के लिए कौन सा टैग उपयोग होता है?", options: ["<heading>", "<h6>", "<h1>", "<head>"], ans: 2 },
-          { q: "हाइपरलिंक बनाने के लिए कौन सा टैग उपयोग किया जाता है?", options: ["<link>", "<a>", "<href>", "<url>"], ans: 1 },
-          { q: "लाइन ब्रेक (Line Break) देने के लिए कौन सा टैग है?", options: ["<lb>", "<break>", "<br>", "<hr>"], ans: 2 }
-        ]
-      }
-    ];
+    // Purane default tests hata diye gaye hain (khali rakha hai)
+    const DEFAULT_TESTS = [];
 
     // ==========================================
     // 2. INITIALIZATION
@@ -617,7 +591,6 @@
         return;
       }
 
-      // Check duplicate mobile locally first
       let localStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
       if (localStudents.some(s => s.mobile === mobile)) {
         showToast("यह मोबाइल नंबर पहले से पंजीकृत है!", true);
@@ -626,7 +599,6 @@
 
       const payload = { action: 'register', fullName, mobile, password };
 
-      // Push to Google Sheets if configured
       if (GOOGLE_SCRIPT_URL) {
         try {
           const res = await fetch(GOOGLE_SCRIPT_URL, {
@@ -639,7 +611,7 @@
             return;
           }
         } catch (err) {
-          console.warn("Sheet API unavailable, fallback to local storage");
+          console.warn("Sheet API connection issue, falling back to local storage");
         }
       }
 
@@ -655,16 +627,18 @@
       switchView('home');
     }
 
-    // Student Login (Name or Mobile)
+    // Student Login (Fixed Name or Mobile Comparison)
     async function handleStudentLogin(e) {
       e.preventDefault();
       const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value.trim();
 
       let localStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
-      const matched = localStudents.find(s => 
-        (s.mobile.toLowerCase() === userKey || s.fullName.toLowerCase() === userKey) && s.password === pass
-      );
+      const matched = localStudents.find(s => {
+        const sMobile = String(s.mobile || '').trim().toLowerCase();
+        const sName = String(s.fullName || '').trim().toLowerCase();
+        return (sMobile === userKey || sName === userKey) && s.password === pass;
+      });
 
       if (matched) {
         currentUser = { role: 'student', fullName: matched.fullName, mobile: matched.mobile };
@@ -698,7 +672,7 @@
       showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
     }
 
-    // Admin Login (Static Credentials)
+    // Admin Login
     function handleAdminLogin(e) {
       e.preventDefault();
       const u = document.getElementById('adminUser').value.trim();
@@ -737,6 +711,19 @@
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
       grid.innerHTML = "";
+
+      if (allAvailableTests.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+            <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-file-circle-question text-xl"></i>
+            </div>
+            <h4 class="font-bold text-slate-700 mb-1">वर्तमान में कोई टेस्ट उपलब्ध नहीं है</h4>
+            <p class="text-xs text-slate-400">एडमिन पैनल से नया टेस्ट बनाए जाने के बाद यहाँ दिखाई देगा।</p>
+          </div>
+        `;
+        return;
+      }
 
       allAvailableTests.forEach(test => {
         const card = document.createElement('div');
@@ -834,7 +821,6 @@
         optsContainer.appendChild(btn);
       });
 
-      // Controls
       document.getElementById('prevQuestionBtn').disabled = currentQIndex === 0;
       const isLast = currentQIndex === activeTest.questions.length - 1;
       document.getElementById('nextQuestionBtn').classList.toggle('hidden', isLast);
@@ -858,7 +844,7 @@
       }
     }
 
-    // Submit CBT Test + Lock First Score
+    // Submit CBT Test + Lock First Attempt Score
     async function submitCBTTest() {
       clearInterval(testTimerInterval);
 
@@ -872,7 +858,6 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      // Prepare local review data for Answer Key
       localReviewData = {
         testTitle: activeTest.title,
         topic: activeTest.topic,
@@ -880,7 +865,6 @@
         userAnswers: { ...userAnswers }
       };
 
-      // Check existing results to enforce ONE-TIME SCORE LOCK
       let allResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
       const alreadySubmitted = allResults.find(r => 
         r.mobile === currentUser.mobile && r.testTitle === activeTest.title
@@ -889,10 +873,8 @@
       const retestNotice = document.getElementById('retestNotice');
 
       if (alreadySubmitted) {
-        // Retest / Practice Mode: Do not overwrite sheet or master results
         retestNotice.classList.remove('hidden');
       } else {
-        // First Attempt: Officially save score
         retestNotice.classList.add('hidden');
         const record = {
           fullName: currentUser.fullName,
@@ -918,7 +900,6 @@
         }
       }
 
-      // Display Results Screen
       document.getElementById('scoreText').innerText = `${score} / ${total}`;
       document.getElementById('percentageText').innerText = `${percentage}%`;
       const gradeBadge = document.getElementById('gradeBadge');
@@ -1074,13 +1055,11 @@
         return;
       }
 
-      // Collect distinct Topics
       const topicSet = new Set();
       allAvailableTests.forEach(t => topicSet.add(t.topic));
       results.forEach(r => topicSet.add(r.topic));
       const topics = Array.from(topicSet);
 
-      // Build Thead: [Topic Header] + [Each Student Name Only]
       const headerTr = document.createElement('tr');
       headerTr.innerHTML = `
         <th class="p-3.5 bg-slate-200 text-slate-800 font-bold sticky left-0 z-30 min-w-[200px] border-r border-slate-300">
@@ -1098,21 +1077,17 @@
       });
       thead.appendChild(headerTr);
 
-      // Build Tbody: Rows = Topics, Cells = Marks of each Student
       topics.forEach(topic => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50";
 
-        // Row Header (Sticky Left Topic)
         tr.innerHTML = `
           <td class="p-3.5 font-bold text-indigo-900 bg-slate-50/90 sticky left-0 z-10 border-r border-slate-200 shadow-xs">
             ${topic}
           </td>
         `;
 
-        // Cells for each student
         students.forEach(st => {
-          // Find first recorded result for this student and topic
           const res = results.find(r => r.mobile === st.mobile && r.topic === topic);
           const td = document.createElement('td');
           td.className = "p-3.5 text-center border-r border-slate-100";
@@ -1133,7 +1108,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN TEST CREATOR (TEXT BOX FOR TOPIC)
+    // 10. ADMIN TEST CREATOR
     // ==========================================
     function addQuestionField() {
       const container = document.getElementById('questionsBuilder');
@@ -1197,12 +1172,10 @@
         questions
       };
 
-      // Save locally
       let customTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
       customTests.push(newTest);
       localStorage.setItem('copa_custom_tests', JSON.stringify(customTests));
 
-      // Save to Google Sheet
       if (GOOGLE_SCRIPT_URL) {
         try {
           fetch(GOOGLE_SCRIPT_URL, {
@@ -1216,7 +1189,7 @@
       showToast("नया टेस्ट जोड़ा गया! होम पेज पर रीडायरेक्ट किया जा रहा है");
       e.target.reset();
       document.getElementById('questionsBuilder').innerHTML = "";
-      switchView('home'); // Redirect to Home
+      switchView('home');
     }
 
     // ==========================================
