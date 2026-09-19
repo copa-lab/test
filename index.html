@@ -74,7 +74,6 @@
         </p>
       </div>
 
-      <!-- Test Sets Listing -->
       <div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -82,7 +81,6 @@
           </h2>
           <span id="testCountBadge" class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">0 टेस्ट उपलब्ध</span>
         </div>
-
         <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
     </section>
@@ -141,16 +139,16 @@
           <i class="fa-solid fa-trophy"></i>
         </div>
         <h2 id="resultTitle" class="text-2xl font-black text-slate-900 mb-1">शानदार प्रदर्शन!</h2>
-        <p id="resultSubtitle" class="text-sm text-slate-500 mb-6">आपका टेस्ट परिणाम सफलतापूर्वक तैयार हो गया है</p>
+        <p id="resultSubtitle" class="text-sm text-slate-500 mb-6">आपका टेस्ट परिणाम तैयार हो गया है</p>
 
         <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mb-6">
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
             <span class="block text-xs text-slate-400 font-bold uppercase">प्राप्तांक</span>
-            <span id="scoreText" class="text-xl font-extrabold text-slate-800">4 / 5</span>
+            <span id="scoreText" class="text-xl font-extrabold text-slate-800">0 / 0</span>
           </div>
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
             <span class="block text-xs text-slate-400 font-bold uppercase">प्रतिशत</span>
-            <span id="percentageText" class="text-xl font-extrabold text-indigo-600">80%</span>
+            <span id="percentageText" class="text-xl font-extrabold text-indigo-600">0%</span>
           </div>
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
             <span class="block text-xs text-slate-400 font-bold uppercase">परिणाम</span>
@@ -175,7 +173,6 @@
         </div>
       </div>
 
-      <!-- ANSWER REVIEW -->
       <div id="answerReviewContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-left">
         <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
           <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
@@ -272,8 +269,6 @@
 
       <!-- Tab B: ADD TEST (MANUAL + EXCEL UPLOAD) -->
       <div id="adminAddTestTab" class="hidden space-y-6">
-        
-        <!-- Mode Switcher -->
         <div class="flex gap-3 bg-slate-100 p-1.5 rounded-xl max-w-md">
           <button type="button" onclick="switchTestCreationMode('manual')" id="modeBtnManual" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition">
             <i class="fa-solid fa-pen mr-1"></i> 1. एक-एक प्रश्न टाइप करें
@@ -283,7 +278,7 @@
           </button>
         </div>
 
-        <!-- 1. MANUAL TEST CREATION FORM -->
+        <!-- 1. MANUAL FORM -->
         <div id="manualTestContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
             <i class="fa-solid fa-circle-plus text-indigo-600"></i> नया टेस्ट बनाएं (Manual Entry)
@@ -322,14 +317,14 @@
           </form>
         </div>
 
-        <!-- 2. EXCEL / CSV BULK UPLOAD -->
+        <!-- 2. EXCEL UPLOAD FORM -->
         <div id="excelTestContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Excel/CSV फ़ाइल से टेस्ट अपलोड करें
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">एक ही बार में कितने भी सवाल (50, 100+) सीधे एक्सेल शीट से अपलोड करें।</p>
+              <p class="text-xs text-slate-500 mt-0.5">एक ही बार में कितने भी सवाल सीधे एक्सेल शीट से अपलोड करें।</p>
             </div>
             <button onclick="downloadSampleExcel()" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
               <i class="fa-solid fa-download"></i> सैंपल Excel फ़ॉर्मेट डाउनलोड करें
@@ -352,7 +347,6 @@
               </div>
             </div>
 
-            <!-- File Upload Area -->
             <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:bg-slate-50 transition cursor-pointer" onclick="document.getElementById('excelFileInput').click()">
               <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="previewExcelFile(event)">
               <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -362,7 +356,6 @@
               <p class="text-xs text-slate-400 mt-1">स्वीकृत फॉर्मेट: .xlsx, .xls, .csv</p>
             </div>
 
-            <!-- Preview Card -->
             <div id="excelPreviewStats" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 font-semibold flex items-center justify-between">
               <span id="excelParsedCount">0 प्रश्न लोड हो चुके हैं।</span>
               <span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> फ़ाइल सही है</span>
@@ -373,7 +366,6 @@
             </button>
           </form>
         </div>
-
       </div>
 
       <!-- Tab C: NOTICE CONTROL -->
@@ -469,7 +461,7 @@
     </div>
   </div>
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toastContent" class="bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -478,7 +470,10 @@
   </div>
 
   <script>
+    // ==========================================
     // 1. CONFIGURATION & STATE
+    // ==========================================
+    // Yahan apna Google Apps Script Web App URL paste karein:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec"; 
 
     let currentUser = null;
@@ -493,7 +488,25 @@
 
     const DEFAULT_TESTS = [];
 
+    // Helper: Send payload to Google Sheets bypassing CORS
+    async function sendToGoogleSheet(payload) {
+      if (!GOOGLE_SCRIPT_URL) return;
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          cache: 'no-cache',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn("Sheet update error:", err);
+      }
+    }
+
+    // ==========================================
     // 2. INITIALIZATION
+    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedSession();
       initializeTestData();
@@ -514,7 +527,9 @@
       setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
     }
 
+    // ==========================================
     // 3. NAVIGATION CONTROLLER
+    // ==========================================
     function switchView(viewName) {
       ['homeView', 'testView', 'resultView', 'profileView', 'adminView'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
@@ -544,7 +559,9 @@
       }
     }
 
-    // 4. AUTHENTICATION
+    // ==========================================
+    // 4. AUTHENTICATION (STUDENT & ADMIN)
+    // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
       if (session) {
@@ -633,27 +650,17 @@
       }
 
       let localStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
-      if (localStudents.some(s => s.mobile === mobile)) {
+      if (localStudents.some(s => String(s.mobile).trim() === mobile)) {
         showToast("यह मोबाइल नंबर पहले से पंजीकृत है!", true);
         return;
       }
 
       const payload = { action: 'register', fullName, mobile, password };
 
-      if (GOOGLE_SCRIPT_URL) {
-        try {
-          const res = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          });
-          const json = await res.json();
-          if (json.status !== 'success') {
-            showToast(json.message || "रजिस्ट्रेशन विफल रहा", true);
-            return;
-          }
-        } catch (err) {}
-      }
+      // Send to Google Sheet
+      sendToGoogleSheet(payload);
 
+      // Save locally
       localStudents.push({ fullName, mobile, password, date: new Date().toLocaleDateString('en-IN') });
       localStorage.setItem('copa_students', JSON.stringify(localStudents));
 
@@ -689,25 +696,6 @@
         return;
       }
 
-      if (GOOGLE_SCRIPT_URL) {
-        try {
-          const res = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'login', userKey, password: pass })
-          });
-          const json = await res.json();
-          if (json.status === 'success') {
-            currentUser = { role: 'student', fullName: json.user.fullName, mobile: json.user.mobile };
-            localStorage.setItem('copa_session', JSON.stringify(currentUser));
-            closeAuthModal();
-            updateAuthUI();
-            showToast("लॉगिन सफल रहा!");
-            switchView('home');
-            return;
-          }
-        } catch (err) {}
-      }
-
       showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
     }
 
@@ -737,7 +725,9 @@
       switchView('home');
     }
 
-    // 5. TEST MANAGEMENT
+    // ==========================================
+    // 5. TEST MANAGEMENT & RENDERING
+    // ==========================================
     function initializeTestData() {
       const stored = localStorage.getItem('copa_custom_tests');
       const customTests = stored ? JSON.parse(stored) : [];
@@ -785,7 +775,9 @@
       });
     }
 
-    // 6. CBT ENGINE
+    // ==========================================
+    // 6. CBT TEST ENGINE & ONE-TIME SCORE LOCK
+    // ==========================================
     function startTest(testId) {
       if (!currentUser || currentUser.role !== 'student') {
         showToast("कृपया टेस्ट देने से पहले लॉगिन करें", true);
@@ -879,7 +871,6 @@
       }
     }
 
-    // Submit CBT Test
     async function submitCBTTest() {
       clearInterval(testTimerInterval);
 
@@ -902,7 +893,7 @@
 
       let allResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
       const alreadySubmitted = allResults.find(r => 
-        r.mobile === currentUser.mobile && r.testTitle === activeTest.title
+        String(r.mobile).trim() === String(currentUser.mobile).trim() && r.testTitle === activeTest.title
       );
 
       const retestNotice = document.getElementById('retestNotice');
@@ -925,14 +916,8 @@
         allResults.push(record);
         localStorage.setItem('copa_results', JSON.stringify(allResults));
 
-        if (GOOGLE_SCRIPT_URL) {
-          try {
-            fetch(GOOGLE_SCRIPT_URL, {
-              method: 'POST',
-              body: JSON.stringify({ action: 'saveResult', ...record })
-            });
-          } catch (err) {}
-        }
+        // Save result directly to Google Sheet
+        sendToGoogleSheet({ action: 'saveResult', ...record });
       }
 
       document.getElementById('scoreText').innerText = `${score} / ${total}`;
@@ -945,7 +930,9 @@
       switchView('result');
     }
 
-    // 7. ANSWER KEY REVIEW
+    // ==========================================
+    // 7. ANSWER KEY REVIEW (GALAT / SAHI CHECK)
+    // ==========================================
     function toggleAnswerReview() {
       const reviewBox = document.getElementById('answerReviewContainer');
       if (!reviewBox.classList.contains('hidden')) {
@@ -1012,7 +999,9 @@
       reviewBox.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // ==========================================
     // 8. STUDENT PROFILE
+    // ==========================================
     function loadStudentProfile() {
       if (!currentUser) return;
       document.getElementById('profStudentName').innerText = currentUser.fullName;
@@ -1021,14 +1010,14 @@
       body.innerHTML = "";
 
       const allResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
-      const myResults = allResults.filter(r => r.mobile === currentUser.mobile);
+      const myResults = allResults.filter(r => String(r.mobile).trim() === String(currentUser.mobile).trim());
 
       if (myResults.length === 0) {
         body.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">अभी तक कोई टेस्ट रिकॉर्ड नहीं है।</td></tr>`;
         return;
       }
 
-      myResults.reverse().forEach(res => {
+      myResults.slice().reverse().forEach(res => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 text-xs sm:text-sm";
         tr.innerHTML = `
@@ -1047,7 +1036,9 @@
       });
     }
 
+    // ==========================================
     // 9. ADMIN MATRIX
+    // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
       ['tabBtnMatrix', 'tabBtnAddTest', 'tabBtnNotice'].forEach(id => {
@@ -1117,7 +1108,7 @@
         `;
 
         students.forEach(st => {
-          const res = results.find(r => r.mobile === st.mobile && r.topic === topic);
+          const res = results.find(r => String(r.mobile).trim() === String(st.mobile).trim() && r.topic === topic);
           const td = document.createElement('td');
           td.className = "p-3.5 text-center border-r border-slate-100";
 
@@ -1136,7 +1127,9 @@
       });
     }
 
-    // 10. TEST CREATION: MANUAL & EXCEL UPLOAD
+    // ==========================================
+    // 10. TEST CREATION (MANUAL & EXCEL)
+    // ==========================================
     function switchTestCreationMode(mode) {
       const btnManual = document.getElementById('modeBtnManual');
       const btnExcel = document.getElementById('modeBtnExcel');
@@ -1156,7 +1149,6 @@
       }
     }
 
-    // Manual Question Field
     function addQuestionField() {
       const container = document.getElementById('questionsBuilder');
       const qNum = container.children.length + 1;
@@ -1188,7 +1180,6 @@
       container.appendChild(card);
     }
 
-    // Handle Manual Creation
     function handleCreateTest(e) {
       e.preventDefault();
       const topic = document.getElementById('newTestTopic').value.trim();
@@ -1217,7 +1208,6 @@
       document.getElementById('questionsBuilder').innerHTML = "";
     }
 
-    // EXCEL / CSV PARSER & UPLOAD
     function downloadSampleExcel() {
       const sampleData = [
         ["Question", "OptionA", "OptionB", "OptionC", "OptionD", "Answer"],
@@ -1254,10 +1244,9 @@
 
           excelUploadedQuestions = [];
 
-          // Row 0 is header, start from Row 1
           for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
-            if (!row || !row[0]) continue; // Skip empty lines
+            if (!row || !row[0]) continue;
 
             const qText = String(row[0]).trim();
             const oA = String(row[1] || '').trim();
@@ -1284,12 +1273,10 @@
             document.getElementById('btnSubmitExcel').disabled = false;
             showToast(`${excelUploadedQuestions.length} प्रश्न लोड हो गए!`);
           } else {
-            showToast("मान्य प्रश्न नहीं मिले! कृपया सैंपल फॉर्मेट देखें।", true);
+            showToast("मान्य प्रश्न नहीं मिले! कृपया सैंपल देखें।", true);
           }
-
         } catch (err) {
           showToast("फ़ाइल पढ़ने में त्रुटि हुई!", true);
-          console.error(err);
         }
       };
 
@@ -1322,27 +1309,22 @@
       excelUploadedQuestions = [];
     }
 
-    // Common Save & Publish Controller
     function saveAndPublishTest(newTest) {
       let customTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
       customTests.push(newTest);
       localStorage.setItem('copa_custom_tests', JSON.stringify(customTests));
 
-      if (GOOGLE_SCRIPT_URL) {
-        try {
-          fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'saveTest', ...newTest })
-          });
-        } catch(err) {}
-      }
+      // Save test directly to Google Sheet
+      sendToGoogleSheet({ action: 'saveTest', ...newTest });
 
       initializeTestData();
-      showToast("नया टेस्ट सफलतापूर्वक पब्लिश हो गया! होम पेज पर रीडायरेक्ट हो रहे हैं...");
+      showToast("नया टेस्ट सफलतापूर्वक पब्लिश हो गया!");
       switchView('home');
     }
 
-    // 11. NOTICE BOARD
+    // ==========================================
+    // 11. NOTICE BOARD CONTROLLER
+    // ==========================================
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
       const noticeText = document.getElementById('noticeText');
@@ -1364,14 +1346,8 @@
       const noticeObj = { text, isActive, updatedAt: new Date().toLocaleDateString('en-IN') };
       localStorage.setItem('copa_notice', JSON.stringify(noticeObj));
 
-      if (GOOGLE_SCRIPT_URL) {
-        try {
-          fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'saveNotice', noticeText: text, isActive })
-          });
-        } catch(err) {}
-      }
+      // Save notice to Google Sheet
+      sendToGoogleSheet({ action: 'saveNotice', noticeText: text, isActive });
 
       fetchNotice();
       showToast("नोटिस सुरक्षित कर दिया गया");
