@@ -105,7 +105,7 @@
         <div class="p-6 sm:p-8">
           <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-3">
             <span id="cbtQuestionTracker">प्रश्न 1 / 5</span>
-            
+            <span id="cbtAttemptStatus" class="text-indigo-600">अनसुलझा</span>
           </div>
 
           <h3 id="cbtQuestionText" class="text-base sm:text-lg font-bold text-slate-800 mb-6 leading-relaxed">प्रश्न लोड हो रहा है...</h3>
@@ -139,7 +139,7 @@
 
         <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mb-6">
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-            <span class="block text-xs text-slate-400 font-bold uppercase">प्राप्तांक</span>
+            <span class="block text-xs text-slate-400 font-bold uppercase">प्राप्तांक (Score)</span>
             <span id="scoreText" class="text-xl font-extrabold text-slate-800">0 / 0</span>
           </div>
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
@@ -152,8 +152,8 @@
           </div>
         </div>
 
-        <p id="retestNotice" class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5 max-w-md mx-auto hidden mb-6">
-          <i class="fa-solid fa-circle-info"></i> यह आपका री-टेस्ट अभ्यास था। डेटाबेस में आपका <b>पहला रिकॉर्डेड स्कोर</b> ही सुरक्षित रहेगा।
+        <p id="retestNotice" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5 max-w-md mx-auto hidden mb-6 font-medium">
+          <i class="fa-solid fa-circle-info mr-1"></i> यह आपका री-टेस्ट अभ्यास था। डेटाबेस व रिकॉर्ड में आपका <b>पहला स्कोर ही सुरक्षित</b> रहेगा।
         </p>
 
         <div class="flex flex-wrap items-center justify-center gap-3">
@@ -247,7 +247,7 @@
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h3 class="font-bold text-slate-800 text-base">विषय-वार संयुक्त मार्क्स शीट (Topic vs Student Matrix)</h3>
-              <p class="text-xs text-slate-500">Row Headers: विषय (Topics) | Column Headers: छात्रों के नाम</p>
+              <p class="text-xs text-slate-500">Row Headers: छात्रों के नाम | Column Headers: विषय (Topics)</p>
             </div>
             <button onclick="refreshDataFromSheet()" class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg">
               <i class="fa-solid fa-arrows-rotate mr-1"></i> शीट से रीलोड
@@ -384,10 +384,10 @@
     </section>
 
   </main>
-<!-- TECHNICAL DEVELOPER FOOTER -->
+
+  <!-- TECHNICAL DEVELOPER FOOTER -->
   <footer class="bg-slate-950 text-slate-400 border-t border-slate-800/80 py-5 mt-12 text-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      
       <!-- System Architecture -->
       <div class="flex items-center space-x-3 text-center sm:text-left">
         <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
@@ -403,14 +403,14 @@
         </div>
       </div>
 
-      <!-- Developer Signature (Clean text without symbol) -->
+      <!-- Developer Signature -->
       <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl font-mono text-[11px] shadow-sm">
         <span class="text-slate-500">Engineered & Developed by</span>
         <span class="text-emerald-400 font-bold tracking-wide">Deepak Sir</span>
       </div>
-
     </div>
   </footer>
+
   <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
@@ -464,14 +464,15 @@
         </form>
 
         <!-- Admin Login -->
-        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="hidden space-y-4">
+        <!-- Admin Login -->
+        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" autocomplete="off" class="hidden space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">एडमिन यूजरनेम *</label>
-            <input type="text" id="adminUser" required placeholder="admin" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500">
+            <input type="text" id="adminUser" required autocomplete="off" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">एडमिन पासवर्ड *</label>
-            <input type="password" id="adminPass" required placeholder="••••••••" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500">
+            <input type="password" id="adminPass" required autocomplete="new-password" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500">
           </div>
           <button type="submit" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition">
             एडमिन पैनल खोलें
@@ -493,8 +494,7 @@
     // ==========================================
     // 1. CONFIGURATION & STATE
     // ==========================================
-    // Yahan apna Google Apps Script Web App URL paste karein:
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec"; 
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
     let liveStudents = [];
     let liveTests = [];
@@ -504,16 +504,13 @@
     let currentUser = null;
     let activeTest = null;
     let currentQIndex = 0;
-    let userAnswers = {}; // Stores { questionIndex: originalOptionIndex }
+    let userAnswers = {}; // { questionIndex: originalOptionIndex }
     let testTimerInterval = null;
     let remainingSeconds = 0;
     let localReviewData = null;
     let excelUploadedQuestions = [];
-
-    // Anti-Cheating Shuffled Exam State
     let shuffledExamQuestions = [];
 
-    // Helper: Fisher-Yates Array Shuffle
     function shuffleArray(array) {
       let arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -523,7 +520,6 @@
       return arr;
     }
 
-    // Helper: Direct API POST
     async function postToGoogleSheet(payload) {
       if (!GOOGLE_SCRIPT_URL) return;
       try {
@@ -566,9 +562,8 @@
           liveResults = data.results || [];
           liveNotice = data.notice || null;
 
-          // If current logged-in student was deleted from sheet, log them out
           if (currentUser && currentUser.role === 'student') {
-            const exists = liveStudents.some(s => s.mobile === currentUser.mobile);
+            const exists = liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === String(currentUser.mobile).trim());
             if (!exists) {
               logout();
               showToast("आपका खाता शीट से हटा दिया गया है", true);
@@ -648,7 +643,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION
+    // 5. AUTHENTICATION (STUDENT & ADMIN)
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -737,7 +732,7 @@
         return;
       }
 
-      if (liveStudents.some(s => String(s.mobile).trim() === mobile)) {
+      if (liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === mobile)) {
         showToast("यह मोबाइल नंबर पहले से पंजीकृत है!", true);
         return;
       }
@@ -755,34 +750,53 @@
       switchView('home');
     }
 
-    // Student Login
+    // Student Login (Responsive & Non-Blocking)
     async function handleStudentLogin(e) {
       e.preventDefault();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> जांच हो रही है...';
+      submitBtn.disabled = true;
+
       const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value.trim();
 
-      await refreshDataFromSheet();
+      try {
+        if (!liveStudents || liveStudents.length === 0) {
+          await refreshDataFromSheet();
+        }
 
-      const matched = liveStudents.find(s => {
-        const sMobile = String(s.mobile || '').trim().toLowerCase();
-        const sName = String(s.fullName || '').trim().toLowerCase();
-        return (sMobile === userKey || sName === userKey) && s.password === pass;
-      });
+        const matched = liveStudents.find(s => {
+          const sMobile = String(s.mobile || '').replace(/'/g, '').trim().toLowerCase();
+          const sName = String(s.fullName || '').trim().toLowerCase();
+          const sPass = String(s.password || '').trim();
+          return (sMobile === userKey || sName === userKey) && sPass === pass;
+        });
 
-      if (matched) {
-        currentUser = { role: 'student', fullName: matched.fullName, mobile: matched.mobile };
-        localStorage.setItem('copa_session', JSON.stringify(currentUser));
-        closeAuthModal();
-        updateAuthUI();
-        showToast("लॉगिन सफल रहा!");
-        switchView('home');
-        return;
+        if (matched) {
+          currentUser = { 
+            role: 'student', 
+            fullName: matched.fullName, 
+            mobile: String(matched.mobile).replace(/'/g, '').trim() 
+          };
+          localStorage.setItem('copa_session', JSON.stringify(currentUser));
+          closeAuthModal();
+          updateAuthUI();
+          showToast("लॉगिन सफल रहा!");
+          switchView('home');
+          return;
+        }
+
+        showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
+      } catch (err) {
+        showToast("लॉगिन में समस्या आई, कृपया पुनः प्रयास करें", true);
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
       }
-
-      showToast("गलत नाम/मोबाइल नंबर या पासवर्ड (या शीट से हटा दिया गया है)!", true);
     }
 
-    // Admin Login
     function handleAdminLogin(e) {
       e.preventDefault();
       const u = document.getElementById('adminUser').value.trim();
@@ -874,7 +888,6 @@
       userAnswers = {};
       remainingSeconds = activeTest.duration * 60;
 
-      // Prepare Shuffled Questions & Shuffled Options
       let rawQuestions = activeTest.questions.map((qObj) => {
         let mappedOptions = qObj.options.map((optText, origOptIdx) => ({
           text: optText,
@@ -970,6 +983,7 @@
       }
     }
 
+    // Submit CBT Test (Display Full Total, but Lock Official Database to First Attempt)
     async function submitCBTTest() {
       clearInterval(testTimerInterval);
 
@@ -985,7 +999,7 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      // Prepare local review data for Answer Key
+      // Prepare Answer Review Key
       localReviewData = {
         testTitle: activeTest.title,
         topic: activeTest.topic,
@@ -1004,19 +1018,29 @@
         }
       });
 
-      const alreadySubmitted = liveResults.find(r => 
-        String(r.mobile).trim() === String(currentUser.mobile).trim() && r.testTitle === activeTest.title
-      );
+      // Strict Check: Match using Mobile + Topic + Title
+      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
+      const currentTopic = String(activeTest.topic).trim().toLowerCase();
+      const currentTitle = String(activeTest.title).trim().toLowerCase();
+
+      const alreadySubmitted = liveResults.find(r => {
+        const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+        const rTopic = String(r.topic || '').trim().toLowerCase();
+        const rTitle = String(r.testTitle || '').trim().toLowerCase();
+        return rMobile === currentMobile && (rTitle === currentTitle || rTopic === currentTopic);
+      });
 
       const retestNotice = document.getElementById('retestNotice');
 
       if (alreadySubmitted) {
+        // Retest: Keep screen score live for student, do not push to Sheet/database
         retestNotice.classList.remove('hidden');
       } else {
+        // First Attempt: Officially record to Sheet & local cache
         retestNotice.classList.add('hidden');
         const record = {
           fullName: currentUser.fullName,
-          mobile: currentUser.mobile,
+          mobile: currentMobile,
           topic: activeTest.topic,
           testTitle: activeTest.title,
           score,
@@ -1029,6 +1053,7 @@
         await postToGoogleSheet({ action: 'saveResult', ...record });
       }
 
+      // Display the current attempt score on screen
       document.getElementById('scoreText').innerText = `${score} / ${total}`;
       document.getElementById('percentageText').innerText = `${percentage}%`;
       const gradeBadge = document.getElementById('gradeBadge');
@@ -1112,7 +1137,8 @@
       const body = document.getElementById('studentResultsBody');
       body.innerHTML = "";
 
-      const myResults = liveResults.filter(r => String(r.mobile).trim() === String(currentUser.mobile).trim());
+      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
+      const myResults = liveResults.filter(r => String(r.mobile || '').replace(/'/g, '').trim() === currentMobile);
 
       if (myResults.length === 0) {
         body.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">अभी तक कोई टेस्ट रिकॉर्ड नहीं है।</td></tr>`;
@@ -1120,6 +1146,11 @@
       }
 
       myResults.slice().reverse().forEach(res => {
+        let pct = String(res.percentage).replace('%', '').trim();
+        let numPct = parseFloat(pct);
+        if (numPct > 0 && numPct <= 1) numPct = Math.round(numPct * 100);
+        else numPct = Math.round(numPct || 0);
+
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 text-xs sm:text-sm";
         tr.innerHTML = `
@@ -1127,7 +1158,7 @@
           <td class="p-3.5 font-bold text-indigo-700">${res.topic}</td>
           <td class="p-3.5 font-medium text-slate-800">${res.testTitle}</td>
           <td class="p-3.5 text-center font-bold">${res.score} / ${res.total}</td>
-          <td class="p-3.5 text-center font-bold text-indigo-600">${res.percentage}%</td>
+          <td class="p-3.5 text-center font-bold text-indigo-600">${numPct}%</td>
           <td class="p-3.5 text-center">
             <span class="px-2.5 py-1 rounded-full text-xs font-bold ${res.status === 'Pass' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${res.status}</span>
           </td>
@@ -1137,7 +1168,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN MATRIX
+    // 10. ADMIN MATRIX (CLEAN, SOLID & ACCURATE)
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1168,50 +1199,65 @@
       tbody.innerHTML = "";
 
       if (liveStudents.length === 0) {
-        tbody.innerHTML = `<tr><td class="p-6 text-center text-slate-400 text-xs">कोई छात्र पंजीकृत नहीं है (शीट खाली है)।</td></tr>`;
+        tbody.innerHTML = `<tr><td class="p-6 text-center text-slate-500 text-xs font-semibold">कोई छात्र पंजीकृत नहीं है (शीट खाली है)।</td></tr>`;
         return;
       }
 
+      // Collect all distinct topics
       const topicSet = new Set();
-      liveTests.forEach(t => topicSet.add(t.topic));
-      liveResults.forEach(r => topicSet.add(r.topic));
+      liveTests.forEach(t => { if (t.topic) topicSet.add(t.topic.trim()); });
+      liveResults.forEach(r => { if (r.topic) topicSet.add(r.topic.trim()); });
       const topics = Array.from(topicSet);
 
+      // Top Row Headers: [Student Name] + [Topics...]
       const headerTr = document.createElement('tr');
       headerTr.innerHTML = `
-        <th class="p-3.5 bg-slate-200 text-slate-800 font-bold sticky left-0 z-30 min-w-[200px] border-r border-slate-300">
-          विषय (TOPIC)
+        <th class="p-3.5 bg-slate-100 text-slate-900 font-bold sticky left-0 z-30 min-w-[200px] border-r border-b border-slate-200">
+          विद्यार्थी का नाम (STUDENT NAME)
         </th>
       `;
-      liveStudents.forEach(st => {
+      topics.forEach(topic => {
         const th = document.createElement('th');
-        th.className = "p-3.5 text-center min-w-[130px] border-r border-slate-200";
+        th.className = "p-3.5 text-center min-w-[140px] border-r border-b border-slate-200 bg-slate-100 text-slate-900 font-bold";
         th.innerHTML = `
-          <div class="font-bold text-slate-800">${st.fullName}</div>
-          <div class="text-[10px] text-slate-400 font-normal">Student</div>
+          <div class="font-bold text-xs uppercase">${topic}</div>
+          <div class="text-[10px] text-indigo-600 font-semibold">Topic Test</div>
         `;
         headerTr.appendChild(th);
       });
       thead.appendChild(headerTr);
 
-      topics.forEach(topic => {
+      // Table Rows: Solid White, Clear Dark Black Text, No Shade
+      liveStudents.forEach(st => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50";
+        tr.className = "hover:bg-slate-50 transition";
+
         tr.innerHTML = `
-          <td class="p-3.5 font-bold text-indigo-900 bg-slate-50/90 sticky left-0 z-10 border-r border-slate-200 shadow-xs">
-            ${topic}
+          <td class="p-3.5 font-bold text-slate-900 bg-white sticky left-0 z-10 border-r border-b border-slate-200">
+            ${st.fullName}
           </td>
         `;
 
-        liveStudents.forEach(st => {
-          const res = liveResults.find(r => String(r.mobile).trim() === String(st.mobile).trim() && r.topic === topic);
+        topics.forEach(topic => {
+          const res = liveResults.find(r => 
+            String(r.mobile || '').replace(/'/g, '').trim() === String(st.mobile || '').replace(/'/g, '').trim() && 
+            String(r.topic || '').trim().toLowerCase() === topic.toLowerCase()
+          );
           const td = document.createElement('td');
-          td.className = "p-3.5 text-center border-r border-slate-100";
+          td.className = "p-3.5 text-center border-r border-b border-slate-200 bg-white";
 
           if (res) {
+            let pct = String(res.percentage).replace('%', '').trim();
+            let numPct = parseFloat(pct);
+            if (numPct > 0 && numPct <= 1) {
+              numPct = Math.round(numPct * 100);
+            } else {
+              numPct = Math.round(numPct || 0);
+            }
+
             td.innerHTML = `
-              <div class="font-extrabold text-xs sm:text-sm text-slate-800">${res.score} / ${res.total}</div>
-              <div class="text-[11px] font-bold ${parseInt(res.percentage) >= 40 ? 'text-emerald-600' : 'text-rose-600'}">${res.percentage}</div>
+              <div class="font-extrabold text-xs sm:text-sm text-slate-900">${res.score} / ${res.total}</div>
+              <div class="text-[11px] font-bold ${numPct >= 40 ? 'text-emerald-600' : 'text-rose-600'}">${numPct}%</div>
             `;
           } else {
             td.innerHTML = `<span class="text-slate-300 font-bold">-</span>`;
