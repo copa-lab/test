@@ -128,7 +128,7 @@
       </div>
     </section>
 
-    <!-- 3. TEST RESULT VIEW -->
+    <!-- 3. TEST RESULT VIEW (REVIEW OPTION REMOVED) -->
     <section id="resultView" class="hidden max-w-3xl mx-auto text-center space-y-6">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div id="resultStatusIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-100 text-emerald-600 text-2xl">
@@ -152,33 +152,24 @@
           </div>
         </div>
 
+        <!-- Instructor Evaluation Notice -->
+        <div class="bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm font-semibold rounded-xl p-3.5 max-w-lg mx-auto mb-6 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-chalkboard-user text-blue-600 text-base"></i>
+          <span>प्रश्नों के सही उत्तर अनुदेशक (Instructor) द्वारा कक्षा / लैब में साझा किए जाएंगे।</span>
+        </div>
+
         <p id="retestNotice" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5 max-w-md mx-auto hidden mb-6 font-medium">
           <i class="fa-solid fa-circle-info mr-1"></i> यह आपका री-टेस्ट अभ्यास था। डेटाबेस व रिकॉर्ड में आपका <b>पहला स्कोर ही सुरक्षित</b> रहेगा।
         </p>
 
         <div class="flex flex-wrap items-center justify-center gap-3">
-          <button onclick="toggleAnswerReview()" class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-xl text-sm hover:bg-blue-700 transition flex items-center gap-2">
-            <i class="fa-solid fa-list-check"></i> <span>प्रश्नों के उत्तर जांचें (Review Answers)</span>
-          </button>
-          <button onclick="switchView('profile')" class="px-5 py-2.5 bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold rounded-xl text-sm hover:bg-indigo-100 transition">
-            मेरी प्रोफाइल देखें
+          <button onclick="switchView('profile')" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl text-sm hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-chart-line"></i> <span>मेरी प्रोफाइल / रिकॉर्ड देखें</span>
           </button>
           <button onclick="switchView('home')" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl text-sm hover:bg-slate-200 transition">
             होम पेज पर जाएं
           </button>
         </div>
-      </div>
-
-      <div id="answerReviewContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-left">
-        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-          <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
-            <i class="fa-solid fa-square-check text-emerald-600"></i> उत्तर समीक्षा (Answer Review Key)
-          </h3>
-          <button onclick="toggleAnswerReview()" class="text-slate-400 hover:text-slate-600 text-sm">
-            <i class="fa-solid fa-xmark"></i> बंद करें
-          </button>
-        </div>
-        <div id="reviewQuestionsList" class="space-y-4"></div>
       </div>
     </section>
 
@@ -388,7 +379,6 @@
   <!-- TECHNICAL DEVELOPER FOOTER -->
   <footer class="bg-slate-950 text-slate-400 border-t border-slate-800/80 py-5 mt-12 text-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <!-- System Architecture -->
       <div class="flex items-center space-x-3 text-center sm:text-left">
         <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
           <i class="fa-solid fa-code text-sm"></i>
@@ -403,7 +393,6 @@
         </div>
       </div>
 
-      <!-- Developer Signature -->
       <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl font-mono text-[11px] shadow-sm">
         <span class="text-slate-500">Engineered & Developed by</span>
         <span class="text-emerald-400 font-bold tracking-wide">Deepak Sir</span>
@@ -463,8 +452,7 @@
           </button>
         </form>
 
-        <!-- Admin Login -->
-        <!-- Admin Login -->
+        <!-- Admin Login (No Autofill/Filled text) -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" autocomplete="off" class="hidden space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">एडमिन यूजरनेम *</label>
@@ -507,7 +495,6 @@
     let userAnswers = {}; // { questionIndex: originalOptionIndex }
     let testTimerInterval = null;
     let remainingSeconds = 0;
-    let localReviewData = null;
     let excelUploadedQuestions = [];
     let shuffledExamQuestions = [];
 
@@ -715,6 +702,8 @@
         btnReg.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
         formReg.classList.remove('hidden');
       } else if (tab === 'adminLogin') {
+        document.getElementById('adminUser').value = '';
+        document.getElementById('adminPass').value = '';
         btnAdmin.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
         formAdmin.classList.remove('hidden');
       }
@@ -750,7 +739,7 @@
       switchView('home');
     }
 
-    // Student Login (Responsive & Non-Blocking)
+    // Student Login
     async function handleStudentLogin(e) {
       e.preventDefault();
 
@@ -999,25 +988,6 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      // Prepare Answer Review Key
-      localReviewData = {
-        testTitle: activeTest.title,
-        topic: activeTest.topic,
-        questions: shuffledExamQuestions.map(sq => ({
-          q: sq.q,
-          options: sq.shuffledOptions.map(o => o.text),
-          ans: sq.shuffledOptions.findIndex(o => o.originalIndex === sq.originalCorrectAns)
-        })),
-        userAnswers: {}
-      };
-
-      shuffledExamQuestions.forEach((sq, i) => {
-        const origSelected = userAnswers[i];
-        if (origSelected !== undefined) {
-          localReviewData.userAnswers[i] = sq.shuffledOptions.findIndex(o => o.originalIndex === origSelected);
-        }
-      });
-
       // Strict Check: Match using Mobile + Topic + Title
       const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
       const currentTopic = String(activeTest.topic).trim().toLowerCase();
@@ -1060,75 +1030,11 @@
       gradeBadge.innerText = status;
       gradeBadge.className = status === 'Pass' ? "text-base font-extrabold text-emerald-600 mt-1 inline-block" : "text-base font-extrabold text-rose-600 mt-1 inline-block";
 
-      document.getElementById('answerReviewContainer').classList.add('hidden');
       switchView('result');
     }
 
     // ==========================================
-    // 8. ANSWER KEY REVIEW
-    // ==========================================
-    function toggleAnswerReview() {
-      const reviewBox = document.getElementById('answerReviewContainer');
-      if (!reviewBox.classList.contains('hidden')) {
-        reviewBox.classList.add('hidden');
-        return;
-      }
-
-      if (!localReviewData) return;
-
-      const listContainer = document.getElementById('reviewQuestionsList');
-      listContainer.innerHTML = "";
-
-      localReviewData.questions.forEach((q, idx) => {
-        const userSelected = localReviewData.userAnswers[idx];
-        const isCorrect = userSelected === q.ans;
-        const isSkipped = userSelected === undefined;
-
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-xl border text-sm ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'}`;
-
-        let optionsHtml = q.options.map((opt, oIdx) => {
-          let badge = "";
-          let optStyle = "text-slate-700";
-
-          if (oIdx === q.ans) {
-            badge = `<span class="text-xs bg-emerald-600 text-white font-bold px-2 py-0.5 rounded ml-2">सही उत्तर</span>`;
-            optStyle = "font-bold text-emerald-800";
-          }
-          if (oIdx === userSelected && !isCorrect) {
-            badge = `<span class="text-xs bg-rose-600 text-white font-bold px-2 py-0.5 rounded ml-2">आपका उत्तर</span>`;
-            optStyle = "font-bold text-rose-800";
-          }
-
-          return `
-            <div class="py-1.5 flex items-center justify-between text-xs sm:text-sm ${optStyle}">
-              <span><b>${String.fromCharCode(65 + oIdx)}.</b> ${opt}</span>
-              ${badge}
-            </div>
-          `;
-        }).join('');
-
-        card.innerHTML = `
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold text-slate-500 uppercase">प्रश्न ${idx + 1}</span>
-            <span class="text-xs font-bold px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-800' : (isSkipped ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')}">
-              ${isCorrect ? 'सही (Correct)' : (isSkipped ? 'छोड़ा गया' : 'गलत (Incorrect)')}
-            </span>
-          </div>
-          <h4 class="font-bold text-slate-900 mb-3">${q.q}</h4>
-          <div class="bg-white/80 p-3 rounded-lg border border-slate-100 divide-y divide-slate-100">
-            ${optionsHtml}
-          </div>
-        `;
-        listContainer.appendChild(card);
-      });
-
-      reviewBox.classList.remove('hidden');
-      reviewBox.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ==========================================
-    // 9. STUDENT PROFILE
+    // 8. STUDENT PROFILE
     // ==========================================
     function loadStudentProfile() {
       if (!currentUser) return;
@@ -1168,7 +1074,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN MATRIX (CLEAN, SOLID & ACCURATE)
+    // 9. ADMIN MATRIX (CLEAN, SOLID & ACCURATE)
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1203,13 +1109,11 @@
         return;
       }
 
-      // Collect all distinct topics
       const topicSet = new Set();
       liveTests.forEach(t => { if (t.topic) topicSet.add(t.topic.trim()); });
       liveResults.forEach(r => { if (r.topic) topicSet.add(r.topic.trim()); });
       const topics = Array.from(topicSet);
 
-      // Top Row Headers: [Student Name] + [Topics...]
       const headerTr = document.createElement('tr');
       headerTr.innerHTML = `
         <th class="p-3.5 bg-slate-100 text-slate-900 font-bold sticky left-0 z-30 min-w-[200px] border-r border-b border-slate-200">
@@ -1227,7 +1131,6 @@
       });
       thead.appendChild(headerTr);
 
-      // Table Rows: Solid White, Clear Dark Black Text, No Shade
       liveStudents.forEach(st => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition";
@@ -1270,7 +1173,7 @@
     }
 
     // ==========================================
-    // 11. TEST CREATION
+    // 10. TEST CREATION
     // ==========================================
     function switchTestCreationMode(mode) {
       const btnManual = document.getElementById('modeBtnManual');
@@ -1452,7 +1355,7 @@
     }
 
     // ==========================================
-    // 12. NOTICE BOARD
+    // 11. NOTICE BOARD
     // ==========================================
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
