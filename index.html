@@ -96,8 +96,8 @@
             <div class="bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-amber-400 font-mono text-sm font-bold">
               <i class="fa-regular fa-clock"></i> <span id="timerDisplay">10:00</span>
             </div>
-            <button onclick="confirmExitTest()" class="text-slate-400 hover:text-rose-400 text-xs px-2.5 py-1 rounded border border-slate-700">
-              बाहर निकलें
+            <button onclick="confirmExitTest()" class="text-rose-300 hover:text-rose-100 text-xs px-2.5 py-1 rounded border border-rose-600/60 bg-rose-950/40">
+              <i class="fa-solid fa-right-from-bracket mr-1"></i> बाहर निकलें
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@
               <button id="nextQuestionBtn" onclick="navigateQuestion(1)" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">
                 अगला <i class="fa-solid fa-arrow-right ml-1"></i>
               </button>
-              <button id="submitTestBtn" onclick="submitCBTTest()" class="hidden px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition shadow">
+              <button id="submitTestBtn" onclick="submitCBTTest(false)" class="hidden px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition shadow">
                 <i class="fa-solid fa-check-double mr-1"></i> टेस्ट सबमिट करें
               </button>
             </div>
@@ -128,7 +128,7 @@
       </div>
     </section>
 
-    <!-- 3. TEST RESULT VIEW (REVIEW OPTION REMOVED) -->
+    <!-- 3. TEST RESULT VIEW (NO REVIEW KEY) -->
     <section id="resultView" class="hidden max-w-3xl mx-auto text-center space-y-6">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div id="resultStatusIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-100 text-emerald-600 text-2xl">
@@ -152,14 +152,13 @@
           </div>
         </div>
 
-        <!-- Instructor Evaluation Notice -->
         <div class="bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm font-semibold rounded-xl p-3.5 max-w-lg mx-auto mb-6 flex items-center justify-center gap-2">
           <i class="fa-solid fa-chalkboard-user text-blue-600 text-base"></i>
           <span>प्रश्नों के सही उत्तर अनुदेशक (Instructor) द्वारा कक्षा / लैब में साझा किए जाएंगे।</span>
         </div>
 
         <p id="retestNotice" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5 max-w-md mx-auto hidden mb-6 font-medium">
-          <i class="fa-solid fa-circle-info mr-1"></i> यह आपका री-टेस्ट अभ्यास था। डेटाबेस व रिकॉर्ड में आपका <b>पहला स्कोर ही सुरक्षित</b> रहेगा।
+          <i class="fa-solid fa-circle-info mr-1"></i> यह आपका री-टेस्ट अभ्यास था। आधिकारिक रिकॉर्ड में आपका <b>पहला स्कोर ही सुरक्षित</b> रहेगा।
         </p>
 
         <div class="flex flex-wrap items-center justify-center gap-3">
@@ -400,6 +399,44 @@
     </div>
   </footer>
 
+  <!-- PRE-EXAM WARNING CONFIRMATION MODAL -->
+  <div id="examWarningModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-rose-100">
+      <div class="p-5 bg-rose-50 border-b border-rose-100 flex items-center gap-3 text-rose-800">
+        <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 text-lg shrink-0">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-base">महत्वपूर्ण परीक्षा निर्देश एवं चेतावनी</h3>
+          <p class="text-xs text-rose-600">कृपया टेस्ट शुरू करने से पहले ध्यानपूर्वक पढ़ें</p>
+        </div>
+      </div>
+      <div class="p-6 space-y-4 text-sm text-slate-700">
+        <div class="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-2 text-xs sm:text-sm">
+          <p class="font-bold text-rose-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-rose-600"></i> केवल पहला प्रयास (First Attempt) मान्य होगा
+          </p>
+          <p class="text-rose-800 leading-relaxed" id="warningModalDynamicText">
+            टेस्ट एक बार शुरू होने के बाद यदि आप <b>बीच में बाहर निकलते हैं, टैब/ब्राउज़र बंद करते हैं, या पेज रीलोड करते हैं</b>, तब भी आपका यह प्रयास दर्ज हो जाएगा और उस समय तक का स्कोर ही Google Sheet में सुरक्षित कर दिया जाएगा।
+          </p>
+        </div>
+        <ul class="text-xs text-slate-600 space-y-1.5 list-disc pl-5">
+          <li>टेस्ट के दौरान टैब बदलने या रिफ्रेश करने की अनुमति नहीं है।</li>
+          <li>परीक्षण के दौरान समय (Timer) निरंतर चलता रहेगा।</li>
+          <li>सबमिट करने के बाद सही उत्तर कक्षा में अनुदेशक द्वारा बताए जाएंगे।</li>
+        </ul>
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button onclick="closeExamWarningModal()" class="px-4 py-2 border border-slate-300 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-100 transition">
+          रद्द करें (Cancel)
+        </button>
+        <button onclick="proceedToExam()" class="px-5 py-2 bg-rose-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-rose-700 transition shadow">
+          हाँ, मैं सहमत हूँ (Start Test)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
@@ -491,6 +528,8 @@
 
     let currentUser = null;
     let activeTest = null;
+    let pendingTestId = null;
+    let isTestRunning = false;
     let currentQIndex = 0;
     let userAnswers = {}; // { questionIndex: originalOptionIndex }
     let testTimerInterval = null;
@@ -577,12 +616,20 @@
     }
 
     // ==========================================
-    // 3. INITIALIZATION
+    // 3. INITIALIZATION & SAFETY HOOKS
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       loadSavedSession();
       updateAuthUI();
       await refreshDataFromSheet();
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      if (isTestRunning && activeTest) {
+        autoSubmitOnExit();
+        e.preventDefault();
+        e.returnValue = 'परीक्षा प्रगति पर है। यदि आप बंद करते हैं तो वर्तमान स्कोर ही सुरक्षित होगा।';
+      }
     });
 
     function showToast(msg, isError = false) {
@@ -805,6 +852,8 @@
 
     function logout() {
       currentUser = null;
+      isTestRunning = false;
+      clearInterval(testTimerInterval);
       localStorage.removeItem('copa_session');
       updateAuthUI();
       showToast("लॉग-आउट सफल");
@@ -812,7 +861,7 @@
     }
 
     // ==========================================
-    // 6. RENDER TESTS (DIRECT FROM SHEET)
+    // 6. RENDER TESTS (ATTEMPT STATUS & RE-PRACTICE BUTTON)
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -834,9 +883,26 @@
         return;
       }
 
+      const currentMobile = currentUser && currentUser.role === 'student' 
+        ? String(currentUser.mobile || '').replace(/'/g, '').trim() 
+        : null;
+
       liveTests.forEach(test => {
+        const testTopic = String(test.topic || '').trim().toLowerCase();
+        const testTitle = String(test.title || '').trim().toLowerCase();
+
+        const isAttempted = currentMobile ? liveResults.some(r => {
+          const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+          const rTopic = String(r.topic || '').trim().toLowerCase();
+          const rTitle = String(r.testTitle || '').trim().toLowerCase();
+          return rMobile === currentMobile && (rTitle === testTitle || rTopic === testTopic);
+        }) : false;
+
         const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.className = `bg-white rounded-2xl p-5 border transition flex flex-col justify-between ${
+          isAttempted ? 'border-emerald-300 shadow-sm' : 'border-slate-200 shadow-sm hover:shadow-md'
+        }`;
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-2">
@@ -844,13 +910,27 @@
               <span class="text-xs text-slate-400"><i class="fa-regular fa-clock"></i> ${test.duration} मिनट</span>
             </div>
             <h3 class="font-bold text-slate-800 text-base mb-1">${test.title}</h3>
-            <p class="text-xs text-slate-500 mb-4">${test.questions.length} बहुविकल्पीय प्रश्न (MCQ) आधारित टेस्ट</p>
+            <p class="text-xs text-slate-500 mb-3">${test.questions.length} बहुविकल्पीय प्रश्न (MCQ) आधारित टेस्ट</p>
+            
+            ${isAttempted ? `
+              <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg mb-3">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i> आप यह टेस्ट दे चुके हैं
+              </div>
+            ` : ''}
           </div>
-          <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs text-slate-500 font-medium">पासिंग: 40%</span>
-            <button onclick="startTest('${test.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
-              <i class="fa-solid fa-play"></i> टेस्ट दें
-            </button>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+            <span class="text-xs text-slate-500 font-medium shrink-0">पासिंग: 40%</span>
+            
+            ${isAttempted ? `
+              <button onclick="promptStartExam('${test.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrows-rotate"></i> दोबारा अभ्यास करने के लिए शुरू करें
+              </button>
+            ` : `
+              <button onclick="promptStartExam('${test.id}', false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-play"></i> टेस्ट दें
+              </button>
+            `}
           </div>
         `;
         grid.appendChild(card);
@@ -858,21 +938,50 @@
     }
 
     // ==========================================
-    // 7. CBT TEST ENGINE (ANTI-CHEATING SHUFFLE)
+    // 7. PRE-EXAM WARNING & TEST INITIATION
     // ==========================================
-    function startTest(testId) {
+    function promptStartExam(testId, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
         showToast("कृपया टेस्ट देने से पहले लॉगिन करें", true);
         openAuthModal('studentLogin');
         return;
       }
+      pendingTestId = testId;
 
+      const dynamicText = document.getElementById('warningModalDynamicText');
+      if (isRetest) {
+        dynamicText.innerHTML = `
+          आप यह टेस्ट <b>पहले दे चुके हैं</b>। यह केवल आपके <b>अभ्यास (Practice)</b> के लिए है। इस प्रयास का स्कोर केवल आपको स्क्रीन पर दिखेगा, लेकिन आधिकारिक रिकॉर्ड/Sheet में आपका <b>पहला स्कोर ही सुरक्षित रहेगा</b>।
+        `;
+      } else {
+        dynamicText.innerHTML = `
+          टेस्ट एक बार शुरू होने के बाद यदि आप <b>बीच में बाहर निकलते हैं, टैब/ब्राउज़र बंद करते हैं, या पेज रीलोड करते हैं</b>, तब भी आपका यह प्रयास दर्ज हो जाएगा और उस समय तक का स्कोर ही Google Sheet में सुरक्षित कर दिया जाएगा।
+        `;
+      }
+
+      document.getElementById('examWarningModal').classList.remove('hidden');
+    }
+
+    function closeExamWarningModal() {
+      document.getElementById('examWarningModal').classList.add('hidden');
+      pendingTestId = null;
+    }
+
+    function proceedToExam() {
+      closeExamWarningModal();
+      if (pendingTestId) {
+        startTest(pendingTestId);
+      }
+    }
+
+    function startTest(testId) {
       activeTest = liveTests.find(t => t.id === testId);
       if (!activeTest) {
         showToast("यह टेस्ट अब उपलब्ध नहीं है", true);
         return;
       }
 
+      isTestRunning = true;
       currentQIndex = 0;
       userAnswers = {};
       remainingSeconds = activeTest.duration * 60;
@@ -908,7 +1017,7 @@
         if (remainingSeconds <= 0) {
           clearInterval(testTimerInterval);
           alert("समय समाप्त हो गया! आपका टेस्ट सबमिट किया जा रहा है।");
-          submitCBTTest();
+          submitCBTTest(false);
           return;
         }
         remainingSeconds--;
@@ -965,15 +1074,64 @@
       renderCurrentQuestion();
     }
 
+    // Mid-Test Exit
     function confirmExitTest() {
-      if (confirm("क्या आप वाकई टेस्ट से बाहर निकलना चाहते हैं? आपकी प्रगति रद्द हो जाएगी।")) {
-        clearInterval(testTimerInterval);
-        switchView('home');
+      const confirmed = confirm("चेतावनी: बीच में बाहर निकलने पर भी यह आपका आधिकारिक प्रयास माना जाएगा और अब तक हल किए प्रश्नों का स्कोर सुरक्षित हो जाएगा। क्या आप वाकई बाहर निकलना चाहते हैं?");
+      if (confirmed) {
+        submitCBTTest(true);
       }
     }
 
-    // Submit CBT Test (Display Full Total, but Lock Official Database to First Attempt)
-    async function submitCBTTest() {
+    // Auto-Submit on Tab Close / Refresh
+    function autoSubmitOnExit() {
+      if (!isTestRunning || !activeTest) return;
+      isTestRunning = false;
+      clearInterval(testTimerInterval);
+
+      let score = 0;
+      const total = shuffledExamQuestions.length || activeTest.questions.length;
+      shuffledExamQuestions.forEach((qItem, i) => {
+        if (userAnswers[i] === qItem.originalCorrectAns) score++;
+      });
+      const percentage = Math.round((score / total) * 100);
+      const status = percentage >= 40 ? "Pass" : "Fail";
+
+      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
+      const currentTopic = String(activeTest.topic).trim().toLowerCase();
+      const currentTitle = String(activeTest.title).trim().toLowerCase();
+
+      const alreadySubmitted = liveResults.find(r => {
+        const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+        const rTopic = String(r.topic || '').trim().toLowerCase();
+        const rTitle = String(r.testTitle || '').trim().toLowerCase();
+        return rMobile === currentMobile && (rTitle === currentTitle || rTopic === currentTopic);
+      });
+
+      if (!alreadySubmitted) {
+        const payload = JSON.stringify({
+          action: 'saveResult',
+          fullName: currentUser.fullName,
+          mobile: currentMobile,
+          topic: activeTest.topic,
+          testTitle: activeTest.title,
+          score,
+          total,
+          percentage,
+          status,
+          dateTime: new Date().toLocaleString('en-IN')
+        });
+
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(GOOGLE_SCRIPT_URL, payload);
+        } else {
+          postToGoogleSheet(JSON.parse(payload));
+        }
+      }
+    }
+
+    // CBT Submit
+    async function submitCBTTest(isEarlyExit = false) {
+      isTestRunning = false;
       clearInterval(testTimerInterval);
 
       let score = 0;
@@ -988,7 +1146,6 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      // Strict Check: Match using Mobile + Topic + Title
       const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
       const currentTopic = String(activeTest.topic).trim().toLowerCase();
       const currentTitle = String(activeTest.title).trim().toLowerCase();
@@ -1003,10 +1160,8 @@
       const retestNotice = document.getElementById('retestNotice');
 
       if (alreadySubmitted) {
-        // Retest: Keep screen score live for student, do not push to Sheet/database
         retestNotice.classList.remove('hidden');
       } else {
-        // First Attempt: Officially record to Sheet & local cache
         retestNotice.classList.add('hidden');
         const record = {
           fullName: currentUser.fullName,
@@ -1023,12 +1178,15 @@
         await postToGoogleSheet({ action: 'saveResult', ...record });
       }
 
-      // Display the current attempt score on screen
       document.getElementById('scoreText').innerText = `${score} / ${total}`;
       document.getElementById('percentageText').innerText = `${percentage}%`;
       const gradeBadge = document.getElementById('gradeBadge');
       gradeBadge.innerText = status;
       gradeBadge.className = status === 'Pass' ? "text-base font-extrabold text-emerald-600 mt-1 inline-block" : "text-base font-extrabold text-rose-600 mt-1 inline-block";
+
+      if (isEarlyExit) {
+        showToast("अधूरा टेस्ट सबमिट कर दिया गया है।");
+      }
 
       switchView('result');
     }
@@ -1074,7 +1232,7 @@
     }
 
     // ==========================================
-    // 9. ADMIN MATRIX (CLEAN, SOLID & ACCURATE)
+    // 9. ADMIN MATRIX (CLEAN & ACCURATE)
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
