@@ -144,7 +144,7 @@
         <div class="p-6 sm:p-8">
           <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-3">
             <span id="cbtQuestionTracker">प्रश्न 1 / 5</span>
-            <span id="cbtAttemptStatus" class="text-indigo-600">अनसुलझा</span>
+            
           </div>
 
           <h3 id="cbtQuestionText" class="text-base sm:text-lg font-bold text-slate-800 mb-6 leading-relaxed">प्रश्न लोड हो रहा है...</h3>
@@ -1070,13 +1070,21 @@
     }
 
     function proceedToExam() {
-      closeExamWarningModal();
+      const modal = document.getElementById('examWarningModal');
+      modal.classList.add('hidden');
+      
       if (pendingTestId) {
         startTest(pendingTestId);
+      } else {
+        showToast("टेस्ट आईडी लोड नहीं हो सकी, पुनः प्रयास करें", true);
       }
     }
 
     function startTest(testId) {
+      console.log("Starting Test ID:", testId);
+      console.log("Available Tests:", liveTests);
+
+      // 1. Loose matching: ID या Title किसी से भी टेस्ट मैच करें
       activeTest = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
                    liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
 
@@ -1085,6 +1093,7 @@
         return;
       }
 
+      // 2. Questions JSON को सुरक्षित पार्स करें (अगर स्ट्रिंग रूप में हो)
       let parsedQuestions = activeTest.questions;
       if (typeof parsedQuestions === 'string') {
         try {
@@ -1104,6 +1113,7 @@
       userAnswers = {};
       remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
 
+      // 3. प्रश्न और विकल्पों को शफल करें
       let rawQuestions = parsedQuestions.map((qObj) => {
         let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
         let mappedOptions = opts.map((optText, origOptIdx) => ({
@@ -1123,6 +1133,7 @@
       document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
       document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
 
+      // 4. टेस्ट स्क्रीन दिखाएँ और टाइमर शुरू करें
       switchView('test');
       renderCurrentQuestion();
       startTimer();
