@@ -975,40 +975,45 @@
     }
 
     function startTest(testId) {
-      activeTest = liveTests.find(t => t.id === testId);
-      if (!activeTest) {
-        showToast("यह टेस्ट अब उपलब्ध नहीं है", true);
+      // 1. ID या Title दोनों से टेस्ट ढूँढने की सुविधा
+      activeTest = liveTests.find(t => String(t.id) === String(testId)) || 
+                   liveTests.find(t => String(t.title).trim() === String(testId).trim());
+
+      if (!activeTest || !activeTest.questions || activeTest.questions.length === 0) {
+        showToast("इस टेस्ट में कोई प्रश्न नहीं मिले या टेस्ट लोड नहीं हुआ!", true);
         return;
       }
 
       isTestRunning = true;
       currentQIndex = 0;
       userAnswers = {};
-      remainingSeconds = activeTest.duration * 60;
+      remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
 
+      // 2. Questions और Options को सुरक्षित रूप से Shuffle करें
       let rawQuestions = activeTest.questions.map((qObj) => {
-        let mappedOptions = qObj.options.map((optText, origOptIdx) => ({
+        let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
+        let mappedOptions = opts.map((optText, origOptIdx) => ({
           text: optText,
           originalIndex: origOptIdx
         }));
 
         return {
-          q: qObj.q,
-          originalCorrectAns: qObj.ans,
+          q: qObj.q || "प्रश्न लोड नहीं हो सका",
+          originalCorrectAns: typeof qObj.ans === 'number' ? qObj.ans : 0,
           shuffledOptions: shuffleArray(mappedOptions)
         };
       });
 
       shuffledExamQuestions = shuffleArray(rawQuestions);
 
-      document.getElementById('cbtTestTopic').innerText = activeTest.topic;
-      document.getElementById('cbtTestTitle').innerText = activeTest.title;
+      document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
+      document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
 
+      // 3. टेस्ट स्क्रीन खोलें और टाइमर चालू करें
       switchView('test');
       renderCurrentQuestion();
       startTimer();
     }
-
     function startTimer() {
       clearInterval(testTimerInterval);
       const timerDisplay = document.getElementById('timerDisplay');
