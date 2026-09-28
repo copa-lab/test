@@ -31,14 +31,20 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2 sm:space-x-3">
         <button onclick="refreshDataFromSheet()" title="शीट से रीलोड करें" class="text-indigo-200 hover:text-white p-2 rounded-lg hover:bg-indigo-800/60 transition">
           <i class="fa-solid fa-rotate text-sm" id="syncSpinner"></i>
         </button>
-        <button onclick="switchView('home')" class="text-sm font-medium hover:text-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5">
+        <button onclick="switchView('home')" class="text-xs sm:text-sm font-medium hover:text-indigo-200 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5">
           <i class="fa-solid fa-house text-xs"></i> <span>होम</span>
         </button>
-        <button id="navProfileBtn" onclick="switchView('profile')" class="hidden text-sm font-medium hover:text-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-amber-300">
+
+        <!-- Practical Lab Section Link (Visible Only After Login) -->
+        <button id="navPracticalBtn" onclick="switchView('practical')" class="hidden text-xs sm:text-sm font-medium hover:text-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-emerald-300">
+          <i class="fa-solid fa-file-lines text-xs"></i> <span>प्रैक्टिकल लैब</span>
+        </button>
+
+        <button id="navProfileBtn" onclick="switchView('profile')" class="hidden text-xs sm:text-sm font-medium hover:text-indigo-200 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-amber-300">
           <i class="fa-solid fa-chart-simple text-xs"></i> <span>मार्क्स & प्रोफाइल</span>
         </button>
         <div id="authContainer">
@@ -84,7 +90,40 @@
       </div>
     </section>
 
-    <!-- 2. CBT TEST VIEW -->
+    <!-- 2. PRACTICAL LAB SECTION (GOOGLE DOCS) -->
+    <section id="practicalView" class="hidden space-y-6 max-w-6xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">COPA Lab</span>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900">प्रैक्टिकल लैब वर्क व असाइनमेंट</h2>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            यहाँ से आप अपने ट्रेड प्रैक्टिकल से संबंधित प्रश्न, कोड फाइलें एवं असाइनमेंट देख सकते हैं।
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a id="openDocExternalBtn" href="#" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-up-right-from-square"></i> <span>नए टैब में खोलें</span>
+          </a>
+          <button onclick="switchView('home')" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold transition">
+            होम पर लौटें
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs text-slate-600 font-medium">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-file-word text-blue-600"></i> Google Docs Viewer</span>
+          <span class="text-[11px] text-slate-400">दस्तावेज़ सीधे Google सर्वर से लोड हो रहा है</span>
+        </div>
+        <div class="w-full h-[650px] bg-slate-50">
+          <iframe id="practicalDocFrame" src="" class="w-full h-full border-0" allow="autoplay"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CBT TEST VIEW -->
     <section id="testView" class="hidden max-w-4xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5">
         <div class="bg-slate-900 text-white px-5 py-4 flex flex-wrap items-center justify-between gap-3">
@@ -128,7 +167,7 @@
       </div>
     </section>
 
-    <!-- 3. TEST RESULT VIEW (NO REVIEW KEY) -->
+    <!-- 4. TEST RESULT VIEW (NO REVIEW KEY) -->
     <section id="resultView" class="hidden max-w-3xl mx-auto text-center space-y-6">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div id="resultStatusIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-100 text-emerald-600 text-2xl">
@@ -172,7 +211,7 @@
       </div>
     </section>
 
-    <!-- 4. STUDENT PROFILE VIEW -->
+    <!-- 5. STUDENT PROFILE VIEW -->
     <section id="profileView" class="hidden space-y-6 max-w-5xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
@@ -216,7 +255,7 @@
       </div>
     </section>
 
-    <!-- 5. ADMIN DASHBOARD VIEW -->
+    <!-- 6. ADMIN DASHBOARD VIEW -->
     <section id="adminView" class="hidden space-y-6">
       <div class="bg-slate-900 text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -226,7 +265,7 @@
         <div class="flex items-center gap-2">
           <button onclick="showAdminTab('matrix')" id="tabBtnMatrix" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">मार्क्स मैट्रिक्स</button>
           <button onclick="showAdminTab('addTest')" id="tabBtnAddTest" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">नया टेस्ट जोड़ें</button>
-          <button onclick="showAdminTab('notice')" id="tabBtnNotice" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">नोटिस कंट्रोल</button>
+          <button onclick="showAdminTab('notice')" id="tabBtnNotice" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">नोटिस व डॉक्स लिंक</button>
           <button onclick="logout()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/80 hover:bg-rose-600 text-white">लॉग-आउट</button>
         </div>
       </div>
@@ -352,24 +391,42 @@
         </div>
       </div>
 
-      <!-- Tab C: NOTICE CONTROL -->
-      <div id="adminNoticeTab" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-xl">
-        <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-bullhorn text-amber-500"></i> नोटिस बोर्ड कंट्रोल
-        </h3>
-        <form onsubmit="handleSaveNotice(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">होम पेज नोटिस टेक्स्ट</label>
-            <textarea id="adminNoticeInput" rows="3" required placeholder="यहाँ छात्र सूचना टाइप करें..." class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"></textarea>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="adminNoticeActive" class="w-4 h-4 text-indigo-600 rounded">
-            <label for="adminNoticeActive" class="text-sm font-semibold text-slate-700">होम पेज पर नोटिस दिखाएं (Active)</label>
-          </div>
-          <button type="submit" class="bg-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition">
-            नोटिस सेव करें
-          </button>
-        </form>
+      <!-- Tab C: NOTICE & PRACTICAL DOCS CONTROL -->
+      <div id="adminNoticeTab" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-xl space-y-6">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-amber-500"></i> नोटिस बोर्ड कंट्रोल
+          </h3>
+          <form onsubmit="handleSaveNotice(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">होम पेज नोटिस टेक्स्ट</label>
+              <textarea id="adminNoticeInput" rows="3" required placeholder="यहाँ छात्र सूचना टाइप करें..." class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"></textarea>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="adminNoticeActive" class="w-4 h-4 text-indigo-600 rounded">
+              <label for="adminNoticeActive" class="text-sm font-semibold text-slate-700">होम पेज पर नोटिस दिखाएं (Active)</label>
+            </div>
+            <button type="submit" class="bg-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition">
+              नोटिस सेव करें
+            </button>
+          </form>
+        </div>
+
+        <div class="border-t border-slate-100 pt-6">
+          <h3 class="font-bold text-slate-800 text-base mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-file-word text-blue-600"></i> प्रैक्टिकल Google Doc लिंक कंट्रोल
+          </h3>
+          <p class="text-xs text-slate-500 mb-4">Google Docs का 'Anyone with the link can view' वाला शेयर लिंक यहाँ डालें।</p>
+          <form onsubmit="handleSaveDocUrl(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Docs URL</label>
+              <input type="url" id="adminDocUrlInput" required placeholder="https://docs.google.com/document/d/.../edit" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition">
+              Google Doc लिंक सुरक्षित करें
+            </button>
+          </form>
+        </div>
       </div>
     </section>
 
@@ -521,6 +578,9 @@
     // ==========================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
+    // Default Practical Google Docs URL (Update directly or via Admin Panel)
+    let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "https://docs.google.com/document/d/1y6Y1Z8m0jZ0jZ0jZ0jZ0jZ0jZ0jZ0jZ0/preview";
+
     let liveStudents = [];
     let liveTests = [];
     let liveResults = [];
@@ -621,6 +681,7 @@
     window.addEventListener('DOMContentLoaded', async () => {
       loadSavedSession();
       updateAuthUI();
+      loadPracticalDoc();
       await refreshDataFromSheet();
     });
 
@@ -648,13 +709,20 @@
     // 4. NAVIGATION CONTROLLER
     // ==========================================
     function switchView(viewName) {
-      ['homeView', 'testView', 'resultView', 'profileView', 'adminView'].forEach(id => {
+      ['homeView', 'practicalView', 'testView', 'resultView', 'profileView', 'adminView'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
 
       if (viewName === 'home') {
         document.getElementById('homeView').classList.remove('hidden');
         renderHomeTests();
+      } else if (viewName === 'practical') {
+        if (!currentUser) {
+          openAuthModal('login');
+          return;
+        }
+        document.getElementById('practicalView').classList.remove('hidden');
+        loadPracticalDoc();
       } else if (viewName === 'test') {
         document.getElementById('testView').classList.remove('hidden');
       } else if (viewName === 'result') {
@@ -677,7 +745,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION (STUDENT & ADMIN)
+    // 5. AUTHENTICATION & PRACTICAL VISIBILITY
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -689,9 +757,11 @@
     function updateAuthUI() {
       const authContainer = document.getElementById('authContainer');
       const navProfileBtn = document.getElementById('navProfileBtn');
+      const navPracticalBtn = document.getElementById('navPracticalBtn');
 
       if (currentUser && currentUser.role === 'student') {
         navProfileBtn.classList.remove('hidden');
+        navPracticalBtn.classList.remove('hidden');
         authContainer.innerHTML = `
           <button onclick="switchView('profile')" class="bg-indigo-800 text-white text-left px-3 py-1.5 rounded-xl border border-indigo-600 flex items-center gap-2">
             <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-xs">
@@ -705,6 +775,7 @@
         `;
       } else if (currentUser && currentUser.role === 'admin') {
         navProfileBtn.classList.add('hidden');
+        navPracticalBtn.classList.remove('hidden');
         authContainer.innerHTML = `
           <button onclick="switchView('admin')" class="bg-slate-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-2">
             <i class="fa-solid fa-user-shield text-emerald-400"></i> एडमिन पैनल
@@ -712,6 +783,7 @@
         `;
       } else {
         navProfileBtn.classList.add('hidden');
+        navPracticalBtn.classList.add('hidden');
         authContainer.innerHTML = `
           <button onclick="openAuthModal('login')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
             लॉगिन / रजिस्टर
@@ -861,7 +933,37 @@
     }
 
     // ==========================================
-    // 6. RENDER TESTS (ATTEMPT STATUS & RE-PRACTICE BUTTON)
+    // 6. PRACTICAL LAB CONTROLLER (GOOGLE DOCS)
+    // ==========================================
+    function loadPracticalDoc() {
+      const frame = document.getElementById('practicalDocFrame');
+      const extBtn = document.getElementById('openDocExternalBtn');
+      const input = document.getElementById('adminDocUrlInput');
+
+      let embedUrl = practicalDocUrl;
+      // Convert normal doc URL to embedded preview format if applicable
+      if (embedUrl.includes('/document/d/') && !embedUrl.includes('/preview')) {
+        embedUrl = embedUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
+      }
+
+      frame.src = embedUrl;
+      extBtn.href = practicalDocUrl;
+      if (input) input.value = practicalDocUrl;
+    }
+
+    function handleSaveDocUrl(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById('adminDocUrlInput').value.trim();
+      if (!inputVal) return;
+
+      practicalDocUrl = inputVal;
+      localStorage.setItem('copa_practical_doc', practicalDocUrl);
+      loadPracticalDoc();
+      showToast("Google Docs लिंक सुरक्षित कर दिया गया!");
+    }
+
+    // ==========================================
+    // 7. RENDER TESTS (ATTEMPT STATUS & RE-PRACTICE BUTTON)
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -938,7 +1040,7 @@
     }
 
     // ==========================================
-    // 7. PRE-EXAM WARNING & TEST INITIATION
+    // 8. PRE-EXAM WARNING & TEST INITIATION
     // ==========================================
     function promptStartExam(testId, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
@@ -968,21 +1070,13 @@
     }
 
     function proceedToExam() {
-      const modal = document.getElementById('examWarningModal');
-      modal.classList.add('hidden');
-      
+      closeExamWarningModal();
       if (pendingTestId) {
         startTest(pendingTestId);
-      } else {
-        showToast("टेस्ट आईडी लोड नहीं हो सकी, पुनः प्रयास करें", true);
       }
     }
 
     function startTest(testId) {
-      console.log("Starting Test ID:", testId);
-      console.log("Available Tests:", liveTests);
-
-      // 1. Loose matching: ID या Title किसी से भी टेस्ट मैच करें
       activeTest = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
                    liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
 
@@ -991,7 +1085,6 @@
         return;
       }
 
-      // 2. Questions JSON को सुरक्षित पार्स करें (अगर स्ट्रिंग रूप में हो)
       let parsedQuestions = activeTest.questions;
       if (typeof parsedQuestions === 'string') {
         try {
@@ -1011,7 +1104,6 @@
       userAnswers = {};
       remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
 
-      // 3. प्रश्न और विकल्पों को शफल करें
       let rawQuestions = parsedQuestions.map((qObj) => {
         let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
         let mappedOptions = opts.map((optText, origOptIdx) => ({
@@ -1031,11 +1123,11 @@
       document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
       document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
 
-      // 4. टेस्ट स्क्रीन दिखाएँ और टाइमर शुरू करें
       switchView('test');
       renderCurrentQuestion();
       startTimer();
     }
+
     function startTimer() {
       clearInterval(testTimerInterval);
       const timerDisplay = document.getElementById('timerDisplay');
@@ -1219,7 +1311,7 @@
     }
 
     // ==========================================
-    // 8. STUDENT PROFILE
+    // 9. STUDENT PROFILE
     // ==========================================
     function loadStudentProfile() {
       if (!currentUser) return;
@@ -1259,7 +1351,7 @@
     }
 
     // ==========================================
-    // 9. ADMIN MATRIX (CLEAN & ACCURATE)
+    // 10. ADMIN MATRIX (CLEAN & ACCURATE)
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1280,6 +1372,7 @@
       } else if (tab === 'notice') {
         document.getElementById('adminNoticeTab').classList.remove('hidden');
         document.getElementById('tabBtnNotice').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+        loadPracticalDoc();
       }
     }
 
@@ -1358,7 +1451,7 @@
     }
 
     // ==========================================
-    // 10. TEST CREATION
+    // 11. TEST CREATION
     // ==========================================
     function switchTestCreationMode(mode) {
       const btnManual = document.getElementById('modeBtnManual');
@@ -1540,7 +1633,7 @@
     }
 
     // ==========================================
-    // 11. NOTICE BOARD
+    // 12. NOTICE BOARD
     // ==========================================
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
