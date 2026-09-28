@@ -968,19 +968,41 @@
     }
 
     function proceedToExam() {
-      closeExamWarningModal();
+      const modal = document.getElementById('examWarningModal');
+      modal.classList.add('hidden');
+      
       if (pendingTestId) {
         startTest(pendingTestId);
+      } else {
+        showToast("टेस्ट आईडी लोड नहीं हो सकी, पुनः प्रयास करें", true);
       }
     }
 
     function startTest(testId) {
-      // 1. ID या Title दोनों से टेस्ट ढूँढने की सुविधा
-      activeTest = liveTests.find(t => String(t.id) === String(testId)) || 
-                   liveTests.find(t => String(t.title).trim() === String(testId).trim());
+      console.log("Starting Test ID:", testId);
+      console.log("Available Tests:", liveTests);
 
-      if (!activeTest || !activeTest.questions || activeTest.questions.length === 0) {
-        showToast("इस टेस्ट में कोई प्रश्न नहीं मिले या टेस्ट लोड नहीं हुआ!", true);
+      // 1. Loose matching: ID या Title किसी से भी टेस्ट मैच करें
+      activeTest = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
+                   liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
+
+      if (!activeTest) {
+        showToast("यह टेस्ट डेटाबेस में नहीं मिला!", true);
+        return;
+      }
+
+      // 2. Questions JSON को सुरक्षित पार्स करें (अगर स्ट्रिंग रूप में हो)
+      let parsedQuestions = activeTest.questions;
+      if (typeof parsedQuestions === 'string') {
+        try {
+          parsedQuestions = JSON.parse(parsedQuestions);
+        } catch (e) {
+          console.error("JSON parse error:", e);
+        }
+      }
+
+      if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
+        showToast("इस टेस्ट में कोई प्रश्न नहीं मिले!", true);
         return;
       }
 
@@ -989,8 +1011,8 @@
       userAnswers = {};
       remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
 
-      // 2. Questions और Options को सुरक्षित रूप से Shuffle करें
-      let rawQuestions = activeTest.questions.map((qObj) => {
+      // 3. प्रश्न और विकल्पों को शफल करें
+      let rawQuestions = parsedQuestions.map((qObj) => {
         let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
         let mappedOptions = opts.map((optText, origOptIdx) => ({
           text: optText,
@@ -1009,7 +1031,7 @@
       document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
       document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
 
-      // 3. टेस्ट स्क्रीन खोलें और टाइमर चालू करें
+      // 4. टेस्ट स्क्रीन दिखाएँ और टाइमर शुरू करें
       switchView('test');
       renderCurrentQuestion();
       startTimer();
