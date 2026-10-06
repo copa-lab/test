@@ -530,11 +530,11 @@
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
       <div class="p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
         <div class="flex gap-2 p-1 bg-slate-200/80 rounded-xl text-xs font-bold">
-          <button onclick="toggleAuthTab('studentLogin')" id="tabStudentLogin" class="px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700">छात्र लॉगिन</button>
-          <button onclick="toggleAuthTab('register')" id="tabRegister" class="px-3 py-1.5 rounded-lg text-slate-600">रजिस्ट्रेशन</button>
-          <button onclick="toggleAuthTab('adminLogin')" id="tabAdminLogin" class="px-3 py-1.5 rounded-lg text-slate-600">एडमिन लॉगिन</button>
+          <button type="button" onclick="toggleAuthTab('studentLogin')" id="tabStudentLogin" class="px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700">छात्र लॉगिन</button>
+          <button type="button" onclick="toggleAuthTab('register')" id="tabRegister" class="px-3 py-1.5 rounded-lg text-slate-600">रजिस्ट्रेशन</button>
+          <button type="button" onclick="toggleAuthTab('adminLogin')" id="tabAdminLogin" class="px-3 py-1.5 rounded-lg text-slate-600">एडमिन लॉगिन</button>
         </div>
-        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 text-base">
+        <button type="button" onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 text-base">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -607,9 +607,9 @@
     // ==========================================
     // 1. CONFIGURATION & STATE
     // ==========================================
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5FtO-BHqm-sjt9mnfSIWvt0dhi9o_x6699-nGO-ZXZolcndXKzTMS1UY4_bh24PBX/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
-    let practicalDocUrl = "https://docs.google.com/document/d/1VC6seY1c-Le4UnJxfS1pepU4ZiBjfpAP/edit?usp=sharing&ouid=114646738274934251511&rtpof=true&sd=true";
+    let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "";
 
     let liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
     let liveTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
@@ -674,7 +674,12 @@
       }
 
       try {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         const data = await res.json();
 
         if (data.status === 'success') {
@@ -698,17 +703,9 @@
             practicalDocUrl = data.practicalDocUrl;
             localStorage.setItem('copa_practical_doc', practicalDocUrl);
           }
-
-          if (currentUser && currentUser.role === 'student') {
-            const exists = liveStudents.some(s => String(s.mobile).replace(/['\s]/g, '').trim() === String(currentUser.mobile).trim());
-            if (!exists && liveStudents.length > 0) {
-              logout();
-              showToast("आपका खाता हटा दिया गया है", true);
-            }
-          }
         }
       } catch (err) {
-        console.warn("Direct sheet load issue, falling back to local storage:", err);
+        console.warn("Direct fetch skipped, using memory cache:", err);
       } finally {
         applyLoadedData();
         if (spinner) spinner.classList.remove('fa-spin');
@@ -771,7 +768,7 @@
         renderHomeTests();
       } else if (viewName === 'practical') {
         if (!currentUser) {
-          openAuthModal('login');
+          openAuthModal('studentLogin');
           return;
         }
         document.getElementById('practicalView').classList.remove('hidden');
@@ -782,7 +779,7 @@
         document.getElementById('resultView').classList.remove('hidden');
       } else if (viewName === 'profile') {
         if (!currentUser || currentUser.role !== 'student') {
-          openAuthModal('login');
+          openAuthModal('studentLogin');
           return;
         }
         document.getElementById('profileView').classList.remove('hidden');
@@ -799,7 +796,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION & LOGIN FIX
+    // 5. AUTHENTICATION & LOGIN POPUP
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -839,22 +836,24 @@
         navProfileBtn.classList.add('hidden');
         navPracticalBtn.classList.add('hidden');
         authContainer.innerHTML = `
-          <button onclick="openAuthModal('login')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
+          <button onclick="openAuthModal('studentLogin')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
             लॉगिन / रजिस्टर
           </button>
         `;
       }
     }
 
-    function openAuthModal(defaultTab = 'login') {
-      document.getElementById('authModal').classList.remove('hidden');
-      if (defaultTab === 'register') toggleAuthTab('register');
-      else if (defaultTab === 'adminLogin') toggleAuthTab('adminLogin');
-      else toggleAuthTab('studentLogin');
+    function openAuthModal(defaultTab = 'studentLogin') {
+      const modal = document.getElementById('authModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        toggleAuthTab(defaultTab);
+      }
     }
 
     function closeAuthModal() {
-      document.getElementById('authModal').classList.add('hidden');
+      const modal = document.getElementById('authModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function toggleAuthTab(tab) {
@@ -865,13 +864,12 @@
       const formReg = document.getElementById('registerForm');
       const formAdmin = document.getElementById('adminLoginForm');
 
+      if (!btnStudent || !formStudent) return;
+
       [btnStudent, btnReg, btnAdmin].forEach(b => b.className = "px-3 py-1.5 rounded-lg text-slate-600");
       [formStudent, formReg, formAdmin].forEach(f => f.classList.add('hidden'));
 
-      if (tab === 'studentLogin') {
-        btnStudent.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
-        formStudent.classList.remove('hidden');
-      } else if (tab === 'register') {
+      if (tab === 'register') {
         btnReg.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
         formReg.classList.remove('hidden');
       } else if (tab === 'adminLogin') {
@@ -879,6 +877,9 @@
         document.getElementById('adminPass').value = '';
         btnAdmin.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
         formAdmin.classList.remove('hidden');
+      } else {
+        btnStudent.className = "px-3 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 font-bold";
+        formStudent.classList.remove('hidden');
       }
     }
 
@@ -913,7 +914,6 @@
       switchView('home');
     }
 
-    // Student Login - String Normalization Matching
     async function handleStudentLogin(e) {
       e.preventDefault();
 
@@ -926,10 +926,6 @@
       const pass = document.getElementById('loginPass').value.trim();
 
       try {
-        if (!liveStudents || liveStudents.length === 0) {
-          await refreshDataFromSheet();
-        }
-
         const matched = liveStudents.find(s => {
           const sMobile = String(s.mobile || '').replace(/['\s]/g, '').toLowerCase();
           const sName = String(s.fullName || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -1049,7 +1045,7 @@
       liveTests.forEach(test => {
         const testTopic = String(test.topic || '').trim().toLowerCase();
         const testTitle = String(test.title || '').trim().toLowerCase();
-        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
+        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES" || String(test.isLocked).toUpperCase() === "TRUE";
 
         const isAttempted = currentMobile ? liveResults.some(r => {
           const rMobile = String(r.mobile || '').replace(/['\s]/g, '').trim();
@@ -1151,7 +1147,7 @@
         return;
       }
 
-      const isLocked = activeTest.isLocked === true || String(activeTest.isLocked).toUpperCase() === "YES";
+      const isLocked = activeTest.isLocked === true || String(activeTest.isLocked).toUpperCase() === "YES" || String(activeTest.isLocked).toUpperCase() === "TRUE";
       if (isLocked) {
         showToast("यह टेस्ट एडमिन द्वारा लॉक कर दिया गया है!", true);
         return;
@@ -1417,7 +1413,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN DASHBOARD
+    // 10. ADMIN DASHBOARD (LOCK & UNLOCK LOGIC)
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminTestControlTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1457,7 +1453,7 @@
       }
 
       liveTests.forEach(test => {
-        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
+        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES" || String(test.isLocked).toUpperCase() === "TRUE";
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50";
 
@@ -1487,29 +1483,22 @@
     }
 
     async function toggleTestStatus(testId, newStatus) {
-      // 1. लोकल स्टेट में टेस्ट ढूँढकर तुरंत अपडेट करें
       const target = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
                      liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
 
       if (target) {
         target.isLocked = newStatus;
         localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
-        
-        // UI को तुरंत रिफ्रेश करें
         renderAdminTestControls();
         renderHomeTests();
-        showToast(newStatus ? "टेस्ट लॉक (बंद) कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
+        showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
 
-        // 2. Google Sheet में अपडेट भेजें
-        await postToGoogleSheet({
+        postToGoogleSheet({
           action: 'toggleTestLock',
           testId: target.id,
           isLocked: newStatus
         });
-      } else {
-        showToast("टेस्ट नहीं मिला!", true);
       }
-    }
     }
 
     function renderAdminMatrix() {
