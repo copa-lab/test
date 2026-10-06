@@ -65,7 +65,7 @@
     </div>
   </div>
 
-  <!-- MAIN WRAPPER -->
+  <!-- MAIN VIEW -->
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full">
 
     <!-- 1. HOME VIEW -->
@@ -700,7 +700,7 @@
           }
 
           if (currentUser && currentUser.role === 'student') {
-            const exists = liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === String(currentUser.mobile).trim());
+            const exists = liveStudents.some(s => String(s.mobile).replace(/['\s]/g, '').trim() === String(currentUser.mobile).trim());
             if (!exists && liveStudents.length > 0) {
               logout();
               showToast("आपका खाता हटा दिया गया है", true);
@@ -799,7 +799,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION
+    // 5. AUTHENTICATION & LOGIN FIX
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -893,12 +893,12 @@
         return;
       }
 
-      if (liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === mobile)) {
+      if (liveStudents.some(s => String(s.mobile).replace(/['\s]/g, '').trim() === mobile)) {
         showToast("यह मोबाइल नंबर पहले से पंजीकृत है!", true);
         return;
       }
 
-      const newStudent = { fullName, mobile, password };
+      const newStudent = { fullName, mobile, password: String(password).trim() };
       liveStudents.push(newStudent);
       localStorage.setItem('copa_students', JSON.stringify(liveStudents));
 
@@ -913,33 +913,52 @@
       switchView('home');
     }
 
+    // Student Login - String Normalization Matching
     async function handleStudentLogin(e) {
       e.preventDefault();
-      const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> जांच हो रही है...';
+      submitBtn.disabled = true;
+
+      const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase().replace(/\s+/g, '');
       const pass = document.getElementById('loginPass').value.trim();
 
-      const matched = liveStudents.find(s => {
-        const sMobile = String(s.mobile || '').replace(/'/g, '').trim().toLowerCase();
-        const sName = String(s.fullName || '').trim().toLowerCase();
-        const sPass = String(s.password || '').trim();
-        return (sMobile === userKey || sName === userKey) && sPass === pass;
-      });
+      try {
+        if (!liveStudents || liveStudents.length === 0) {
+          await refreshDataFromSheet();
+        }
 
-      if (matched) {
-        currentUser = { 
-          role: 'student', 
-          fullName: matched.fullName, 
-          mobile: String(matched.mobile).replace(/'/g, '').trim() 
-        };
-        localStorage.setItem('copa_session', JSON.stringify(currentUser));
-        closeAuthModal();
-        updateAuthUI();
-        showToast("लॉगिन सफल रहा!");
-        switchView('home');
-        return;
+        const matched = liveStudents.find(s => {
+          const sMobile = String(s.mobile || '').replace(/['\s]/g, '').toLowerCase();
+          const sName = String(s.fullName || '').trim().toLowerCase().replace(/\s+/g, '');
+          const sPass = String(s.password !== undefined && s.password !== null ? s.password : '').trim();
+          
+          return (sMobile === userKey || sName === userKey) && sPass === pass;
+        });
+
+        if (matched) {
+          currentUser = { 
+            role: 'student', 
+            fullName: matched.fullName, 
+            mobile: String(matched.mobile).replace(/['\s]/g, '').trim() 
+          };
+          localStorage.setItem('copa_session', JSON.stringify(currentUser));
+          closeAuthModal();
+          updateAuthUI();
+          showToast("लॉगिन सफल रहा!");
+          switchView('home');
+          return;
+        }
+
+        showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
+      } catch (err) {
+        showToast("लॉगिन में समस्या आई, कृपया पुनः प्रयास करें", true);
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
       }
-
-      showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
     }
 
     function handleAdminLogin(e) {
@@ -1024,7 +1043,7 @@
       }
 
       const currentMobile = currentUser && currentUser.role === 'student' 
-        ? String(currentUser.mobile || '').replace(/'/g, '').trim() 
+        ? String(currentUser.mobile || '').replace(/['\s]/g, '').trim() 
         : null;
 
       liveTests.forEach(test => {
@@ -1033,7 +1052,7 @@
         const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
 
         const isAttempted = currentMobile ? liveResults.some(r => {
-          const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+          const rMobile = String(r.mobile || '').replace(/['\s]/g, '').trim();
           const rTopic = String(r.topic || '').trim().toLowerCase();
           const rTitle = String(r.testTitle || '').trim().toLowerCase();
           return rMobile === currentMobile && (rTitle === testTitle || rTopic === testTopic);
@@ -1262,12 +1281,12 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
+      const currentMobile = String(currentUser.mobile).replace(/['\s]/g, '').trim();
       const currentTopic = String(activeTest.topic).trim().toLowerCase();
       const currentTitle = String(activeTest.title).trim().toLowerCase();
 
       const alreadySubmitted = liveResults.find(r => {
-        const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+        const rMobile = String(r.mobile || '').replace(/['\s]/g, '').trim();
         const rTopic = String(r.topic || '').trim().toLowerCase();
         const rTitle = String(r.testTitle || '').trim().toLowerCase();
         return rMobile === currentMobile && (rTitle === currentTitle || rTopic === currentTopic);
@@ -1311,12 +1330,12 @@
       const percentage = Math.round((score / total) * 100);
       const status = percentage >= 40 ? "Pass" : "Fail";
 
-      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
+      const currentMobile = String(currentUser.mobile).replace(/['\s]/g, '').trim();
       const currentTopic = String(activeTest.topic).trim().toLowerCase();
       const currentTitle = String(activeTest.title).trim().toLowerCase();
 
       const alreadySubmitted = liveResults.find(r => {
-        const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
+        const rMobile = String(r.mobile || '').replace(/['\s]/g, '').trim();
         const rTopic = String(r.topic || '').trim().toLowerCase();
         const rTitle = String(r.testTitle || '').trim().toLowerCase();
         return rMobile === currentMobile && (rTitle === currentTitle || rTopic === currentTopic);
@@ -1367,8 +1386,8 @@
       const body = document.getElementById('studentResultsBody');
       body.innerHTML = "";
 
-      const currentMobile = String(currentUser.mobile).replace(/'/g, '').trim();
-      const myResults = liveResults.filter(r => String(r.mobile || '').replace(/'/g, '').trim() === currentMobile);
+      const currentMobile = String(currentUser.mobile).replace(/['\s]/g, '').trim();
+      const myResults = liveResults.filter(r => String(r.mobile || '').replace(/['\s]/g, '').trim() === currentMobile);
 
       if (myResults.length === 0) {
         body.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">अभी तक कोई टेस्ट रिकॉर्ड नहीं है।</td></tr>`;
@@ -1529,7 +1548,7 @@
 
         topics.forEach(topic => {
           const res = liveResults.find(r => 
-            String(r.mobile || '').replace(/'/g, '').trim() === String(st.mobile || '').replace(/'/g, '').trim() && 
+            String(r.mobile || '').replace(/['\s]/g, '').trim() === String(st.mobile || '').replace(/['\s]/g, '').trim() && 
             String(r.topic || '').trim().toLowerCase() === topic.toLowerCase()
           );
           const td = document.createElement('td');
