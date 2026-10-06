@@ -15,7 +15,7 @@
 </head>
 <body class="text-slate-800 flex flex-col min-h-screen">
 
-  <!-- TOP HEADER & NAVBAR -->
+  <!-- HEADER -->
   <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
@@ -39,7 +39,6 @@
           <i class="fa-solid fa-house text-xs"></i> <span>होम</span>
         </button>
 
-        <!-- Practical Lab Link -->
         <button id="navPracticalBtn" onclick="switchView('practical')" class="hidden text-xs sm:text-sm font-medium hover:text-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-emerald-300">
           <i class="fa-solid fa-file-lines text-xs"></i> <span>प्रैक्टिकल लैब</span>
         </button>
@@ -66,7 +65,7 @@
     </div>
   </div>
 
-  <!-- MAIN VIEW CONTAINER -->
+  <!-- MAIN WRAPPER -->
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full">
 
     <!-- 1. HOME VIEW -->
@@ -90,7 +89,7 @@
       </div>
     </section>
 
-    <!-- 2. PRACTICAL LAB VIEW (GOOGLE DOCS) -->
+    <!-- 2. PRACTICAL LAB VIEW -->
     <section id="practicalView" class="hidden space-y-6 max-w-6xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -167,7 +166,7 @@
       </div>
     </section>
 
-    <!-- 4. TEST RESULT VIEW (NO REVIEW KEY) -->
+    <!-- 4. TEST RESULT VIEW -->
     <section id="resultView" class="hidden max-w-3xl mx-auto text-center space-y-6">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div id="resultStatusIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-100 text-emerald-600 text-2xl">
@@ -271,7 +270,7 @@
         </div>
       </div>
 
-      <!-- Tab A: SPREADSHEET MATRIX -->
+      <!-- Tab A: MARKS MATRIX -->
       <div id="adminMatrixTab" class="space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -293,7 +292,7 @@
         </div>
       </div>
 
-      <!-- Tab B: TEST LOCK / UNLOCK CONTROL -->
+      <!-- Tab B: LOCK/UNLOCK CONTROL -->
       <div id="adminTestControlTab" class="hidden space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
           <div class="flex items-center justify-between mb-4">
@@ -367,7 +366,7 @@
 
             <div class="pt-4 border-t border-slate-100">
               <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">
-                टेस्ट पब्लिश करें और Google Sheet में जोड़ें
+                टेस्ट पब्लिश करें और जोड़ें
               </button>
             </div>
           </form>
@@ -379,7 +378,7 @@
               <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Excel/CSV फ़ाइल से टेस्ट अपलोड करें
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">एक ही बार में कितने भी सवाल सीधे एक्सेल शीट से अपलोड करें।</p>
+              <p class="text-xs text-slate-500 mt-0.5">एक ही बार में सभी प्रश्न एक्सेल शीट से अपलोड करें।</p>
             </div>
             <button onclick="downloadSampleExcel()" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
               <i class="fa-solid fa-download"></i> सैंपल Excel फ़ॉर्मेट डाउनलोड करें
@@ -417,13 +416,13 @@
             </div>
 
             <button type="submit" id="btnSubmitExcel" disabled class="w-full bg-emerald-600 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition">
-              Excel टेस्ट पब्लिश करें और Google Sheet में जोड़ें
+              Excel टेस्ट पब्लिश करें और जोड़ें
             </button>
           </form>
         </div>
       </div>
 
-      <!-- Tab D: NOTICE & PRACTICAL DOCS CONTROL -->
+      <!-- Tab D: NOTICE & DOCS CONTROL -->
       <div id="adminNoticeTab" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-xl space-y-6">
         <div>
           <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
@@ -464,7 +463,7 @@
 
   </main>
 
-  <!-- TECHNICAL DEVELOPER FOOTER -->
+  <!-- FOOTER -->
   <footer class="bg-slate-950 text-slate-400 border-t border-slate-800/80 py-5 mt-12 text-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-3 text-center sm:text-left">
@@ -488,7 +487,7 @@
     </div>
   </footer>
 
-  <!-- PRE-EXAM WARNING CONFIRMATION MODAL -->
+  <!-- PRE-EXAM WARNING MODAL -->
   <div id="examWarningModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-rose-100">
       <div class="p-5 bg-rose-50 border-b border-rose-100 flex items-center gap-3 text-rose-800">
@@ -578,7 +577,7 @@
           </button>
         </form>
 
-        <!-- Admin Login (No Autofill/Filled text) -->
+        <!-- Admin Login -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" autocomplete="off" class="hidden space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">एडमिन यूजरनेम *</label>
@@ -596,7 +595,7 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- TOAST -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toastContent" class="bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -612,23 +611,22 @@
 
     let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "";
 
-    let liveStudents = [];
-    let liveTests = [];
-    let liveResults = [];
-    let liveNotice = null;
+    let liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
+    let liveTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
+    let liveResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
+    let liveNotice = JSON.parse(localStorage.getItem('copa_notice') || 'null');
 
     let currentUser = null;
     let activeTest = null;
     let pendingTestId = null;
     let isTestRunning = false;
     let currentQIndex = 0;
-    let userAnswers = {}; // { questionIndex: originalOptionIndex }
+    let userAnswers = {};
     let testTimerInterval = null;
     let remainingSeconds = 0;
     let excelUploadedQuestions = [];
     let shuffledExamQuestions = [];
 
-    // Helper: Fisher-Yates Array Shuffle
     function shuffleArray(array) {
       let arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -638,7 +636,6 @@
       return arr;
     }
 
-    // Helper: Bilingual Text Formatter (Hindi / English)
     function formatBilingualText(rawText) {
       if (!rawText) return "";
       let parts = String(rawText).split(" / ");
@@ -648,7 +645,6 @@
       return rawText;
     }
 
-    // Direct POST to Google Sheets API
     async function postToGoogleSheet(payload) {
       if (!GOOGLE_SCRIPT_URL) return;
       try {
@@ -665,17 +661,13 @@
     }
 
     // ==========================================
-    // 2. LIVE SYNC FROM GOOGLE SHEET
+    // 2. LIVE SYNC
     // ==========================================
     async function refreshDataFromSheet() {
       const spinner = document.getElementById('syncSpinner');
       if (spinner) spinner.classList.add('fa-spin');
 
       if (!GOOGLE_SCRIPT_URL) {
-        liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
-        liveTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
-        liveResults = JSON.parse(localStorage.getItem('copa_results') || '[]');
-        liveNotice = JSON.parse(localStorage.getItem('copa_notice') || 'null');
         applyLoadedData();
         if (spinner) spinner.classList.remove('fa-spin');
         return;
@@ -686,11 +678,22 @@
         const data = await res.json();
 
         if (data.status === 'success') {
-          liveStudents = data.students || [];
-          liveTests = data.tests || [];
-          liveResults = data.results || [];
-          liveNotice = data.notice || null;
-
+          if (Array.isArray(data.students)) {
+            liveStudents = data.students;
+            localStorage.setItem('copa_students', JSON.stringify(liveStudents));
+          }
+          if (Array.isArray(data.tests) && data.tests.length > 0) {
+            liveTests = data.tests;
+            localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
+          }
+          if (Array.isArray(data.results)) {
+            liveResults = data.results;
+            localStorage.setItem('copa_results', JSON.stringify(liveResults));
+          }
+          if (data.notice) {
+            liveNotice = data.notice;
+            localStorage.setItem('copa_notice', JSON.stringify(liveNotice));
+          }
           if (data.practicalDocUrl) {
             practicalDocUrl = data.practicalDocUrl;
             localStorage.setItem('copa_practical_doc', practicalDocUrl);
@@ -698,16 +701,16 @@
 
           if (currentUser && currentUser.role === 'student') {
             const exists = liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === String(currentUser.mobile).trim());
-            if (!exists) {
+            if (!exists && liveStudents.length > 0) {
               logout();
-              showToast("आपका खाता शीट से हटा दिया गया है", true);
+              showToast("आपका खाता हटा दिया गया है", true);
             }
           }
-          applyLoadedData();
         }
       } catch (err) {
-        console.error("Fetch Sheet error:", err);
+        console.warn("Direct sheet load issue, falling back to local storage:", err);
       } finally {
+        applyLoadedData();
         if (spinner) spinner.classList.remove('fa-spin');
       }
     }
@@ -726,12 +729,12 @@
     }
 
     // ==========================================
-    // 3. INITIALIZATION & SAFETY HOOKS
+    // 3. INITIALIZATION
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       loadSavedSession();
       updateAuthUI();
-      loadPracticalDoc();
+      applyLoadedData();
       await refreshDataFromSheet();
     });
 
@@ -739,7 +742,7 @@
       if (isTestRunning && activeTest) {
         autoSubmitOnExit();
         e.preventDefault();
-        e.returnValue = 'परीक्षा प्रगति पर है। यदि आप बंद करते हैं तो वर्तमान स्कोर ही सुरक्षित होगा।';
+        e.returnValue = 'परीक्षा प्रगति पर है। वर्तमान स्कोर ही सुरक्षित होगा।';
       }
     });
 
@@ -756,7 +759,7 @@
     }
 
     // ==========================================
-    // 4. NAVIGATION CONTROLLER
+    // 4. NAVIGATION
     // ==========================================
     function switchView(viewName) {
       ['homeView', 'practicalView', 'testView', 'resultView', 'profileView', 'adminView'].forEach(id => {
@@ -796,7 +799,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION & ACCESS CONTROL
+    // 5. AUTHENTICATION
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -879,7 +882,6 @@
       }
     }
 
-    // Student Registration
     async function handleRegister(e) {
       e.preventDefault();
       const fullName = document.getElementById('regName').value.trim();
@@ -896,10 +898,12 @@
         return;
       }
 
-      const payload = { action: 'register', fullName, mobile, password };
-      await postToGoogleSheet(payload);
+      const newStudent = { fullName, mobile, password };
+      liveStudents.push(newStudent);
+      localStorage.setItem('copa_students', JSON.stringify(liveStudents));
 
-      liveStudents.push({ fullName, mobile, password });
+      postToGoogleSheet({ action: 'register', ...newStudent });
+
       currentUser = { role: 'student', fullName, mobile };
       localStorage.setItem('copa_session', JSON.stringify(currentUser));
 
@@ -909,51 +913,33 @@
       switchView('home');
     }
 
-    // Student Login
     async function handleStudentLogin(e) {
       e.preventDefault();
-
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> जांच हो रही है...';
-      submitBtn.disabled = true;
-
       const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value.trim();
 
-      try {
-        if (!liveStudents || liveStudents.length === 0) {
-          await refreshDataFromSheet();
-        }
+      const matched = liveStudents.find(s => {
+        const sMobile = String(s.mobile || '').replace(/'/g, '').trim().toLowerCase();
+        const sName = String(s.fullName || '').trim().toLowerCase();
+        const sPass = String(s.password || '').trim();
+        return (sMobile === userKey || sName === userKey) && sPass === pass;
+      });
 
-        const matched = liveStudents.find(s => {
-          const sMobile = String(s.mobile || '').replace(/'/g, '').trim().toLowerCase();
-          const sName = String(s.fullName || '').trim().toLowerCase();
-          const sPass = String(s.password || '').trim();
-          return (sMobile === userKey || sName === userKey) && sPass === pass;
-        });
-
-        if (matched) {
-          currentUser = { 
-            role: 'student', 
-            fullName: matched.fullName, 
-            mobile: String(matched.mobile).replace(/'/g, '').trim() 
-          };
-          localStorage.setItem('copa_session', JSON.stringify(currentUser));
-          closeAuthModal();
-          updateAuthUI();
-          showToast("लॉगिन सफल रहा!");
-          switchView('home');
-          return;
-        }
-
-        showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
-      } catch (err) {
-        showToast("लॉगिन में समस्या आई, कृपया पुनः प्रयास करें", true);
-      } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+      if (matched) {
+        currentUser = { 
+          role: 'student', 
+          fullName: matched.fullName, 
+          mobile: String(matched.mobile).replace(/'/g, '').trim() 
+        };
+        localStorage.setItem('copa_session', JSON.stringify(currentUser));
+        closeAuthModal();
+        updateAuthUI();
+        showToast("लॉगिन सफल रहा!");
+        switchView('home');
+        return;
       }
+
+      showToast("गलत नाम/मोबाइल नंबर या पासवर्ड!", true);
     }
 
     function handleAdminLogin(e) {
@@ -984,7 +970,7 @@
     }
 
     // ==========================================
-    // 6. PRACTICAL LAB VIEWER (GOOGLE DOCS)
+    // 6. PRACTICAL LAB (GOOGLE DOCS)
     // ==========================================
     function loadPracticalDoc() {
       const frame = document.getElementById('practicalDocFrame');
@@ -1011,14 +997,11 @@
       loadPracticalDoc();
       showToast("Google Docs लिंक सुरक्षित कर दिया गया!");
 
-      await postToGoogleSheet({
-        action: 'saveDocUrl',
-        docUrl: practicalDocUrl
-      });
+      postToGoogleSheet({ action: 'saveDocUrl', docUrl: practicalDocUrl });
     }
 
     // ==========================================
-    // 7. RENDER TESTS (LOCK STATUS & PRACTICE BUTTON)
+    // 7. RENDER TESTS
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -1047,11 +1030,8 @@
       liveTests.forEach(test => {
         const testTopic = String(test.topic || '').trim().toLowerCase();
         const testTitle = String(test.title || '').trim().toLowerCase();
-
-        // Lock Status Check
         const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
 
-        // Attempted Check
         const isAttempted = currentMobile ? liveResults.some(r => {
           const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
           const rTopic = String(r.topic || '').trim().toLowerCase();
@@ -1071,7 +1051,7 @@
               <span class="text-xs text-slate-400"><i class="fa-regular fa-clock"></i> ${test.duration} मिनट</span>
             </div>
             <h3 class="font-bold text-slate-800 text-base mb-1">${test.title}</h3>
-            <p class="text-xs text-slate-500 mb-3">${test.questions.length} बहुविकल्पीय प्रश्न (MCQ) आधारित टेस्ट</p>
+            <p class="text-xs text-slate-500 mb-3">${(test.questions || []).length} बहुविकल्पीय प्रश्न (MCQ) आधारित टेस्ट</p>
             
             ${isLocked ? `
               <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg mb-3">
@@ -1107,7 +1087,7 @@
     }
 
     // ==========================================
-    // 8. PRE-EXAM WARNING & TEST ENGINE
+    // 8. CBT TEST ENGINE
     // ==========================================
     function promptStartExam(testId, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
@@ -1160,11 +1140,7 @@
 
       let parsedQuestions = activeTest.questions;
       if (typeof parsedQuestions === 'string') {
-        try {
-          parsedQuestions = JSON.parse(parsedQuestions);
-        } catch (e) {
-          console.error("JSON parse error:", e);
-        }
+        try { parsedQuestions = JSON.parse(parsedQuestions); } catch (e) {}
       }
 
       if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
@@ -1364,7 +1340,8 @@
           dateTime: new Date().toLocaleString('en-IN')
         };
         liveResults.push(record);
-        await postToGoogleSheet({ action: 'saveResult', ...record });
+        localStorage.setItem('copa_results', JSON.stringify(liveResults));
+        postToGoogleSheet({ action: 'saveResult', ...record });
       }
 
       document.getElementById('scoreText').innerText = `${score} / ${total}`;
@@ -1421,7 +1398,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN DASHBOARD (MATRIX & LOCK CONTROL)
+    // 10. ADMIN DASHBOARD
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminTestControlTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1450,7 +1427,6 @@
       }
     }
 
-    // Admin: Test Lock / Unlock Controls
     function renderAdminTestControls() {
       const tbody = document.getElementById('adminTestControlBody');
       if (!tbody) return;
@@ -1495,11 +1471,12 @@
       const target = liveTests.find(t => String(t.id).trim() === String(testId).trim());
       if (target) {
         target.isLocked = newStatus;
+        localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
         renderAdminTestControls();
         renderHomeTests();
         showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
 
-        await postToGoogleSheet({
+        postToGoogleSheet({
           action: 'toggleTestLock',
           testId: testId,
           isLocked: newStatus
@@ -1507,7 +1484,6 @@
       }
     }
 
-    // Admin: Result Matrix
     function renderAdminMatrix() {
       const thead = document.getElementById('matrixHead');
       const tbody = document.getElementById('matrixBody');
@@ -1583,7 +1559,7 @@
     }
 
     // ==========================================
-    // 11. TEST CREATION (MANUAL & EXCEL)
+    // 11. TEST CREATION
     // ==========================================
     function switchTestCreationMode(mode) {
       const btnManual = document.getElementById('modeBtnManual');
@@ -1660,7 +1636,9 @@
 
       const newTest = { id: "T_" + Date.now(), topic, title, duration, questions, isLocked: false };
       liveTests.push(newTest);
-      await postToGoogleSheet({ action: 'saveTest', ...newTest });
+      localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
+      
+      postToGoogleSheet({ action: 'saveTest', ...newTest });
 
       e.target.reset();
       document.getElementById('questionsBuilder').innerHTML = "";
@@ -1752,7 +1730,9 @@
 
       const newTest = { id: "T_" + Date.now(), topic, title, duration, questions: excelUploadedQuestions, isLocked: false };
       liveTests.push(newTest);
-      await postToGoogleSheet({ action: 'saveTest', ...newTest });
+      localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
+      
+      postToGoogleSheet({ action: 'saveTest', ...newTest });
 
       e.target.reset();
       document.getElementById('excelFileNameDisplay').innerText = "Excel या CSV फ़ाइल यहाँ चुनें";
@@ -1760,12 +1740,12 @@
       document.getElementById('btnSubmitExcel').disabled = true;
       excelUploadedQuestions = [];
 
-      showToast("Excel टेस्ट Google Sheet में जोड़ दिया गया!");
+      showToast("Excel टेस्ट सुरक्षित हो गया!");
       switchView('home');
     }
 
     // ==========================================
-    // 12. NOTICE BOARD CONTROLLER
+    // 12. NOTICE BOARD
     // ==========================================
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
@@ -1785,10 +1765,11 @@
       const isActive = document.getElementById('adminNoticeActive').checked;
 
       liveNotice = { text, isActive };
-      await postToGoogleSheet({ action: 'saveNotice', noticeText: text, isActive });
-
+      localStorage.setItem('copa_notice', JSON.stringify(liveNotice));
       fetchNotice();
       showToast("नोटिस सुरक्षित कर दिया गया");
+
+      postToGoogleSheet({ action: 'saveNotice', noticeText: text, isActive });
     }
   </script>
 </body>
