@@ -674,12 +674,9 @@
       }
 
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-        const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
+        // Cache bypass ke liye timestamp parameter jodein (?t=...)
+        const freshUrl = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(freshUrl);
         const data = await res.json();
 
         if (data.status === 'success') {
@@ -687,7 +684,8 @@
             liveStudents = data.students;
             localStorage.setItem('copa_students', JSON.stringify(liveStudents));
           }
-          if (Array.isArray(data.tests) && data.tests.length > 0) {
+          if (Array.isArray(data.tests)) {
+            // Live Sheet se aaya lock status hi primary rahega
             liveTests = data.tests;
             localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
           }
@@ -705,7 +703,7 @@
           }
         }
       } catch (err) {
-        console.warn("Direct fetch skipped, using memory cache:", err);
+        console.warn("Sync warning:", err);
       } finally {
         applyLoadedData();
         if (spinner) spinner.classList.remove('fa-spin');
@@ -1491,13 +1489,17 @@
         localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
         renderAdminTestControls();
         renderHomeTests();
-        showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
+        showToast(newStatus ? "टेस्ट लॉक (बंद) कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
 
-        postToGoogleSheet({
+        // Google Sheet me update bhejna
+        await postToGoogleSheet({
           action: 'toggleTestLock',
           testId: target.id,
           isLocked: newStatus
         });
+
+        // 1 second baad sheet se fresh sync confirm karna
+        setTimeout(refreshDataFromSheet, 1200);
       }
     }
 
