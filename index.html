@@ -1487,20 +1487,29 @@
     }
 
     async function toggleTestStatus(testId, newStatus) {
-      const target = liveTests.find(t => String(t.id).trim() === String(testId).trim());
+      // 1. लोकल स्टेट में टेस्ट ढूँढकर तुरंत अपडेट करें
+      const target = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
+                     liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
+
       if (target) {
         target.isLocked = newStatus;
         localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
+        
+        // UI को तुरंत रिफ्रेश करें
         renderAdminTestControls();
         renderHomeTests();
-        showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
+        showToast(newStatus ? "टेस्ट लॉक (बंद) कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
 
-        postToGoogleSheet({
+        // 2. Google Sheet में अपडेट भेजें
+        await postToGoogleSheet({
           action: 'toggleTestLock',
-          testId: testId,
+          testId: target.id,
           isLocked: newStatus
         });
+      } else {
+        showToast("टेस्ट नहीं मिला!", true);
       }
+    }
     }
 
     function renderAdminMatrix() {
