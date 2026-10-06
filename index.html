@@ -39,7 +39,7 @@
           <i class="fa-solid fa-house text-xs"></i> <span>होम</span>
         </button>
 
-        <!-- Practical Lab Section Link (Visible Only After Login) -->
+        <!-- Practical Lab Link -->
         <button id="navPracticalBtn" onclick="switchView('practical')" class="hidden text-xs sm:text-sm font-medium hover:text-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-800/60 transition flex items-center gap-1.5 text-emerald-300">
           <i class="fa-solid fa-file-lines text-xs"></i> <span>प्रैक्टिकल लैब</span>
         </button>
@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <!-- MAIN VIEW -->
+  <!-- MAIN VIEW CONTAINER -->
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full">
 
     <!-- 1. HOME VIEW -->
@@ -90,7 +90,7 @@
       </div>
     </section>
 
-    <!-- 2. PRACTICAL LAB SECTION (GOOGLE DOCS) -->
+    <!-- 2. PRACTICAL LAB VIEW (GOOGLE DOCS) -->
     <section id="practicalView" class="hidden space-y-6 max-w-6xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -144,7 +144,7 @@
         <div class="p-6 sm:p-8">
           <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-3">
             <span id="cbtQuestionTracker">प्रश्न 1 / 5</span>
-            
+            <span id="cbtAttemptStatus" class="text-indigo-600">अनसुलझा</span>
           </div>
 
           <h3 id="cbtQuestionText" class="text-base sm:text-lg font-bold text-slate-800 mb-6 leading-relaxed">प्रश्न लोड हो रहा है...</h3>
@@ -264,6 +264,7 @@
         </div>
         <div class="flex items-center gap-2">
           <button onclick="showAdminTab('matrix')" id="tabBtnMatrix" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">मार्क्स मैट्रिक्स</button>
+          <button onclick="showAdminTab('testControl')" id="tabBtnTestControl" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">लॉक / अनलॉक कंट्रोल</button>
           <button onclick="showAdminTab('addTest')" id="tabBtnAddTest" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">नया टेस्ट जोड़ें</button>
           <button onclick="showAdminTab('notice')" id="tabBtnNotice" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white">नोटिस व डॉक्स लिंक</button>
           <button onclick="logout()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/80 hover:bg-rose-600 text-white">लॉग-आउट</button>
@@ -292,7 +293,38 @@
         </div>
       </div>
 
-      <!-- Tab B: ADD TEST -->
+      <!-- Tab B: TEST LOCK / UNLOCK CONTROL -->
+      <div id="adminTestControlTab" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i class="fa-solid fa-lock-open text-indigo-600"></i> टेस्ट एक्टिवेशन व लॉक/अनलॉक कंट्रोल
+              </h3>
+              <p class="text-xs text-slate-500">किसी भी टेस्ट को तुरंत छात्रों के लिए बंद (Lock) या चालू (Unlock) करें।</p>
+            </div>
+            <button onclick="renderAdminTestControls()" class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg">
+              <i class="fa-solid fa-arrows-rotate mr-1"></i> रिफ्रेश
+            </button>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-xs uppercase font-bold border-b border-slate-200">
+                  <th class="p-3.5">विषय (Topic)</th>
+                  <th class="p-3.5">टेस्ट शीर्षक (Title)</th>
+                  <th class="p-3.5 text-center">वर्तमान स्थिति</th>
+                  <th class="p-3.5 text-center">एक्शन (Action)</th>
+                </tr>
+              </thead>
+              <tbody id="adminTestControlBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab C: ADD TEST -->
       <div id="adminAddTestTab" class="hidden space-y-6">
         <div class="flex gap-3 bg-slate-100 p-1.5 rounded-xl max-w-md">
           <button type="button" onclick="switchTestCreationMode('manual')" id="modeBtnManual" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition">
@@ -391,7 +423,7 @@
         </div>
       </div>
 
-      <!-- Tab C: NOTICE & PRACTICAL DOCS CONTROL -->
+      <!-- Tab D: NOTICE & PRACTICAL DOCS CONTROL -->
       <div id="adminNoticeTab" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-xl space-y-6">
         <div>
           <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
@@ -420,7 +452,7 @@
           <form onsubmit="handleSaveDocUrl(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Docs URL</label>
-              <input type="url" id="adminDocUrlInput" required placeholder="https://docs.google.com/document/d/.../edit" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+              <input type="url" id="adminDocUrlInput" required placeholder="https://docs.google.com/document/d/.../preview" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
             </div>
             <button type="submit" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition">
               Google Doc लिंक सुरक्षित करें
@@ -564,7 +596,7 @@
     </div>
   </div>
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toastContent" class="bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -578,8 +610,7 @@
     // ==========================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
-    // Default Practical Google Docs URL (Update directly or via Admin Panel)
-    let practicalDocUrl = "https://docs.google.com/document/d/e/2PACX-1vQsWzs42iCD85vC2GmEAY73TUMFTV8jJDIRBtILWgEXn2IE1xzyvhDCA5SoHpX1SA/pub";
+    let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "";
 
     let liveStudents = [];
     let liveTests = [];
@@ -597,6 +628,7 @@
     let excelUploadedQuestions = [];
     let shuffledExamQuestions = [];
 
+    // Helper: Fisher-Yates Array Shuffle
     function shuffleArray(array) {
       let arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -606,6 +638,17 @@
       return arr;
     }
 
+    // Helper: Bilingual Text Formatter (Hindi / English)
+    function formatBilingualText(rawText) {
+      if (!rawText) return "";
+      let parts = String(rawText).split(" / ");
+      if (parts.length > 1) {
+        return `<div>${parts[0]}</div><div class="text-xs text-slate-500 font-normal italic mt-0.5">${parts[1]}</div>`;
+      }
+      return rawText;
+    }
+
+    // Direct POST to Google Sheets API
     async function postToGoogleSheet(payload) {
       if (!GOOGLE_SCRIPT_URL) return;
       try {
@@ -648,6 +691,11 @@
           liveResults = data.results || [];
           liveNotice = data.notice || null;
 
+          if (data.practicalDocUrl) {
+            practicalDocUrl = data.practicalDocUrl;
+            localStorage.setItem('copa_practical_doc', practicalDocUrl);
+          }
+
           if (currentUser && currentUser.role === 'student') {
             const exists = liveStudents.some(s => String(s.mobile).replace(/'/g, '').trim() === String(currentUser.mobile).trim());
             if (!exists) {
@@ -667,11 +715,13 @@
     function applyLoadedData() {
       renderHomeTests();
       fetchNotice();
+      loadPracticalDoc();
       if (!document.getElementById('profileView').classList.contains('hidden')) {
         loadStudentProfile();
       }
       if (!document.getElementById('adminView').classList.contains('hidden')) {
         renderAdminMatrix();
+        renderAdminTestControls();
       }
     }
 
@@ -741,11 +791,12 @@
         }
         document.getElementById('adminView').classList.remove('hidden');
         renderAdminMatrix();
+        renderAdminTestControls();
       }
     }
 
     // ==========================================
-    // 5. AUTHENTICATION & PRACTICAL VISIBILITY
+    // 5. AUTHENTICATION & ACCESS CONTROL
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -933,25 +984,24 @@
     }
 
     // ==========================================
-    // 6. PRACTICAL LAB CONTROLLER (GOOGLE DOCS)
+    // 6. PRACTICAL LAB VIEWER (GOOGLE DOCS)
     // ==========================================
     function loadPracticalDoc() {
       const frame = document.getElementById('practicalDocFrame');
       const extBtn = document.getElementById('openDocExternalBtn');
       const input = document.getElementById('adminDocUrlInput');
 
-      let embedUrl = practicalDocUrl;
-      // Convert normal doc URL to embedded preview format if applicable
-      if (embedUrl.includes('/document/d/') && !embedUrl.includes('/preview')) {
+      let embedUrl = practicalDocUrl || "";
+      if (embedUrl.includes('/document/d/') && !embedUrl.includes('/preview') && !embedUrl.includes('/pub')) {
         embedUrl = embedUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
       }
 
-      frame.src = embedUrl;
-      extBtn.href = practicalDocUrl;
-      if (input) input.value = practicalDocUrl;
+      if (frame) frame.src = embedUrl;
+      if (extBtn) extBtn.href = practicalDocUrl || "#";
+      if (input) input.value = practicalDocUrl || "";
     }
 
-    function handleSaveDocUrl(e) {
+    async function handleSaveDocUrl(e) {
       e.preventDefault();
       const inputVal = document.getElementById('adminDocUrlInput').value.trim();
       if (!inputVal) return;
@@ -960,10 +1010,15 @@
       localStorage.setItem('copa_practical_doc', practicalDocUrl);
       loadPracticalDoc();
       showToast("Google Docs लिंक सुरक्षित कर दिया गया!");
+
+      await postToGoogleSheet({
+        action: 'saveDocUrl',
+        docUrl: practicalDocUrl
+      });
     }
 
     // ==========================================
-    // 7. RENDER TESTS (ATTEMPT STATUS & RE-PRACTICE BUTTON)
+    // 7. RENDER TESTS (LOCK STATUS & PRACTICE BUTTON)
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -993,6 +1048,10 @@
         const testTopic = String(test.topic || '').trim().toLowerCase();
         const testTitle = String(test.title || '').trim().toLowerCase();
 
+        // Lock Status Check
+        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
+
+        // Attempted Check
         const isAttempted = currentMobile ? liveResults.some(r => {
           const rMobile = String(r.mobile || '').replace(/'/g, '').trim();
           const rTopic = String(r.topic || '').trim().toLowerCase();
@@ -1002,7 +1061,7 @@
 
         const card = document.createElement('div');
         card.className = `bg-white rounded-2xl p-5 border transition flex flex-col justify-between ${
-          isAttempted ? 'border-emerald-300 shadow-sm' : 'border-slate-200 shadow-sm hover:shadow-md'
+          isLocked ? 'border-rose-200 bg-rose-50/10' : (isAttempted ? 'border-emerald-300 shadow-sm' : 'border-slate-200 shadow-sm hover:shadow-md')
         }`;
 
         card.innerHTML = `
@@ -1014,17 +1073,25 @@
             <h3 class="font-bold text-slate-800 text-base mb-1">${test.title}</h3>
             <p class="text-xs text-slate-500 mb-3">${test.questions.length} बहुविकल्पीय प्रश्न (MCQ) आधारित टेस्ट</p>
             
-            ${isAttempted ? `
+            ${isLocked ? `
+              <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg mb-3">
+                <i class="fa-solid fa-lock text-rose-600"></i> परीक्षा वर्तमान में बंद (Locked) है
+              </div>
+            ` : (isAttempted ? `
               <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg mb-3">
                 <i class="fa-solid fa-circle-check text-emerald-600"></i> आप यह टेस्ट दे चुके हैं
               </div>
-            ` : ''}
+            ` : '')}
           </div>
 
           <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
             <span class="text-xs text-slate-500 font-medium shrink-0">पासिंग: 40%</span>
             
-            ${isAttempted ? `
+            ${isLocked ? `
+              <button disabled class="bg-slate-200 text-slate-400 cursor-not-allowed text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5">
+                <i class="fa-solid fa-lock"></i> लॉक है
+              </button>
+            ` : (isAttempted ? `
               <button onclick="promptStartExam('${test.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-arrows-rotate"></i> दोबारा अभ्यास करने के लिए शुरू करें
               </button>
@@ -1032,7 +1099,7 @@
               <button onclick="promptStartExam('${test.id}', false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-play"></i> टेस्ट दें
               </button>
-            `}
+            `)}
           </div>
         `;
         grid.appendChild(card);
@@ -1040,7 +1107,7 @@
     }
 
     // ==========================================
-    // 8. PRE-EXAM WARNING & TEST INITIATION
+    // 8. PRE-EXAM WARNING & TEST ENGINE
     // ==========================================
     function promptStartExam(testId, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
@@ -1070,21 +1137,13 @@
     }
 
     function proceedToExam() {
-      const modal = document.getElementById('examWarningModal');
-      modal.classList.add('hidden');
-      
+      closeExamWarningModal();
       if (pendingTestId) {
         startTest(pendingTestId);
-      } else {
-        showToast("टेस्ट आईडी लोड नहीं हो सकी, पुनः प्रयास करें", true);
       }
     }
 
     function startTest(testId) {
-      console.log("Starting Test ID:", testId);
-      console.log("Available Tests:", liveTests);
-
-      // 1. Loose matching: ID या Title किसी से भी टेस्ट मैच करें
       activeTest = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
                    liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
 
@@ -1093,7 +1152,12 @@
         return;
       }
 
-      // 2. Questions JSON को सुरक्षित पार्स करें (अगर स्ट्रिंग रूप में हो)
+      const isLocked = activeTest.isLocked === true || String(activeTest.isLocked).toUpperCase() === "YES";
+      if (isLocked) {
+        showToast("यह टेस्ट एडमिन द्वारा लॉक कर दिया गया है!", true);
+        return;
+      }
+
       let parsedQuestions = activeTest.questions;
       if (typeof parsedQuestions === 'string') {
         try {
@@ -1113,7 +1177,6 @@
       userAnswers = {};
       remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
 
-      // 3. प्रश्न और विकल्पों को शफल करें
       let rawQuestions = parsedQuestions.map((qObj) => {
         let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
         let mappedOptions = opts.map((optText, origOptIdx) => ({
@@ -1133,7 +1196,6 @@
       document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
       document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
 
-      // 4. टेस्ट स्क्रीन दिखाएँ और टाइमर शुरू करें
       switchView('test');
       renderCurrentQuestion();
       startTimer();
@@ -1160,7 +1222,7 @@
     function renderCurrentQuestion() {
       const currentItem = shuffledExamQuestions[currentQIndex];
       document.getElementById('cbtQuestionTracker').innerText = `प्रश्न ${currentQIndex + 1} / ${shuffledExamQuestions.length}`;
-      document.getElementById('cbtQuestionText').innerText = currentItem.q;
+      document.getElementById('cbtQuestionText').innerHTML = formatBilingualText(currentItem.q);
 
       const optsContainer = document.getElementById('cbtOptionsContainer');
       optsContainer.innerHTML = "";
@@ -1178,10 +1240,10 @@
         }`;
         btn.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
               isSelected ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
             }">${String.fromCharCode(65 + displayIdx)}</span>
-            <span>${optObj.text}</span>
+            <span>${formatBilingualText(optObj.text)}</span>
           </div>
           ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-600"></i>' : ''}
         `;
@@ -1204,7 +1266,6 @@
       renderCurrentQuestion();
     }
 
-    // Mid-Test Exit
     function confirmExitTest() {
       const confirmed = confirm("चेतावनी: बीच में बाहर निकलने पर भी यह आपका आधिकारिक प्रयास माना जाएगा और अब तक हल किए प्रश्नों का स्कोर सुरक्षित हो जाएगा। क्या आप वाकई बाहर निकलना चाहते हैं?");
       if (confirmed) {
@@ -1212,7 +1273,6 @@
       }
     }
 
-    // Auto-Submit on Tab Close / Refresh
     function autoSubmitOnExit() {
       if (!isTestRunning || !activeTest) return;
       isTestRunning = false;
@@ -1259,7 +1319,6 @@
       }
     }
 
-    // CBT Submit
     async function submitCBTTest(isEarlyExit = false) {
       isTestRunning = false;
       clearInterval(testTimerInterval);
@@ -1362,11 +1421,11 @@
     }
 
     // ==========================================
-    // 10. ADMIN MATRIX (CLEAN & ACCURATE)
+    // 10. ADMIN DASHBOARD (MATRIX & LOCK CONTROL)
     // ==========================================
     function showAdminTab(tab) {
-      ['adminMatrixTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      ['tabBtnMatrix', 'tabBtnAddTest', 'tabBtnNotice'].forEach(id => {
+      ['adminMatrixTab', 'adminTestControlTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['tabBtnMatrix', 'tabBtnTestControl', 'tabBtnAddTest', 'tabBtnNotice'].forEach(id => {
         document.getElementById(id).className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:text-white";
       });
 
@@ -1374,6 +1433,10 @@
         document.getElementById('adminMatrixTab').classList.remove('hidden');
         document.getElementById('tabBtnMatrix').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
         renderAdminMatrix();
+      } else if (tab === 'testControl') {
+        document.getElementById('adminTestControlTab').classList.remove('hidden');
+        document.getElementById('tabBtnTestControl').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+        renderAdminTestControls();
       } else if (tab === 'addTest') {
         document.getElementById('adminAddTestTab').classList.remove('hidden');
         document.getElementById('tabBtnAddTest').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
@@ -1387,6 +1450,64 @@
       }
     }
 
+    // Admin: Test Lock / Unlock Controls
+    function renderAdminTestControls() {
+      const tbody = document.getElementById('adminTestControlBody');
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      if (liveTests.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs">कोई टेस्ट उपलब्ध नहीं है।</td></tr>`;
+        return;
+      }
+
+      liveTests.forEach(test => {
+        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES";
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50";
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-indigo-900">${test.topic}</td>
+          <td class="p-3.5 font-medium text-slate-800">${test.title}</td>
+          <td class="p-3.5 text-center">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${
+              isLocked ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+            }">
+              ${isLocked ? '🔒 Locked (बंद)' : '✓ Unlocked (चालू)'}
+            </span>
+          </td>
+          <td class="p-3.5 text-center">
+            <button onclick="toggleTestStatus('${test.id}', ${!isLocked})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm ${
+              isLocked 
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                : 'bg-rose-600 hover:bg-rose-700 text-white'
+            }">
+              <i class="fa-solid ${isLocked ? 'fa-lock-open' : 'fa-lock'}"></i>
+              <span>${isLocked ? 'Unlock (चालू करें)' : 'Lock (बंद करें)'}</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function toggleTestStatus(testId, newStatus) {
+      const target = liveTests.find(t => String(t.id).trim() === String(testId).trim());
+      if (target) {
+        target.isLocked = newStatus;
+        renderAdminTestControls();
+        renderHomeTests();
+        showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
+
+        await postToGoogleSheet({
+          action: 'toggleTestLock',
+          testId: testId,
+          isLocked: newStatus
+        });
+      }
+    }
+
+    // Admin: Result Matrix
     function renderAdminMatrix() {
       const thead = document.getElementById('matrixHead');
       const tbody = document.getElementById('matrixBody');
@@ -1462,7 +1583,7 @@
     }
 
     // ==========================================
-    // 11. TEST CREATION
+    // 11. TEST CREATION (MANUAL & EXCEL)
     // ==========================================
     function switchTestCreationMode(mode) {
       const btnManual = document.getElementById('modeBtnManual');
@@ -1494,12 +1615,12 @@
           <span class="text-xs font-bold text-slate-600 uppercase">प्रश्न संख्या ${qNum}</span>
           ${qNum > 1 ? '<button type="button" onclick="this.closest(\'.question-item\').remove()" class="text-rose-500 text-xs font-bold hover:underline">हटाएं</button>' : ''}
         </div>
-        <input type="text" placeholder="प्रश्न यहाँ टाइप करें..." required class="q-title w-full text-sm p-2.5 border rounded-lg bg-white">
+        <input type="text" placeholder="प्रश्न (उदा. रैम क्या है? / What is RAM?)" required class="q-title w-full text-sm p-2.5 border rounded-lg bg-white">
         <div class="grid grid-cols-2 gap-2">
-          <input type="text" placeholder="विकल्प A" required class="q-opt-0 text-xs p-2 border rounded-md bg-white">
-          <input type="text" placeholder="विकल्प B" required class="q-opt-1 text-xs p-2 border rounded-md bg-white">
-          <input type="text" placeholder="विकल्प C" required class="q-opt-2 text-xs p-2 border rounded-md bg-white">
-          <input type="text" placeholder="विकल्प D" required class="q-opt-3 text-xs p-2 border rounded-md bg-white">
+          <input type="text" placeholder="विकल्प A / Opt A" required class="q-opt-0 text-xs p-2 border rounded-md bg-white">
+          <input type="text" placeholder="विकल्प B / Opt B" required class="q-opt-1 text-xs p-2 border rounded-md bg-white">
+          <input type="text" placeholder="विकल्प C / Opt C" required class="q-opt-2 text-xs p-2 border rounded-md bg-white">
+          <input type="text" placeholder="विकल्प D / Opt D" required class="q-opt-3 text-xs p-2 border rounded-md bg-white">
         </div>
         <div class="flex items-center gap-2 pt-1">
           <label class="text-xs font-bold text-slate-600">सही उत्तर:</label>
@@ -1537,7 +1658,7 @@
         questions.push({ q: qText, options: [o0, o1, o2, o3], ans });
       });
 
-      const newTest = { id: "T_" + Date.now(), topic, title, duration, questions };
+      const newTest = { id: "T_" + Date.now(), topic, title, duration, questions, isLocked: false };
       liveTests.push(newTest);
       await postToGoogleSheet({ action: 'saveTest', ...newTest });
 
@@ -1550,9 +1671,9 @@
     function downloadSampleExcel() {
       const sampleData = [
         ["Question", "OptionA", "OptionB", "OptionC", "OptionD", "Answer"],
-        ["कंप्यूटर की मुख्य मेमोरी कौन सी होती है?", "RAM", "ROM", "Hard Disk", "CD-ROM", "A"],
-        ["BIOS किस चिप में स्टोर होता है?", "SRAM", "DRAM", "ROM", "Cache", "C"],
-        ["HTML का पूरा नाम क्या है?", "Hyper Text Markup Language", "High Text Multi Language", "None", "All", "A"]
+        ["कंप्यूटर की मुख्य मेमोरी कौन सी होती है? / Which is primary memory?", "रैम / RAM", "रॉम / ROM", "हार्ड डिस्क / Hard Disk", "सीडी / CD-ROM", "A"],
+        ["BIOS किस चिप में स्टोर होता है? / In which chip is BIOS stored?", "SRAM", "DRAM", "ROM", "Cache", "C"],
+        ["HTML का पूरा नाम क्या है? / What is the full form of HTML?", "Hyper Text Markup Language", "High Text Multi Language", "None", "All", "A"]
       ];
 
       const ws = XLSX.utils.aoa_to_sheet(sampleData);
@@ -1629,7 +1750,7 @@
       const title = document.getElementById('excelTestTitle').value.trim();
       const duration = parseInt(document.getElementById('excelTestDuration').value);
 
-      const newTest = { id: "T_" + Date.now(), topic, title, duration, questions: excelUploadedQuestions };
+      const newTest = { id: "T_" + Date.now(), topic, title, duration, questions: excelUploadedQuestions, isLocked: false };
       liveTests.push(newTest);
       await postToGoogleSheet({ action: 'saveTest', ...newTest });
 
@@ -1644,7 +1765,7 @@
     }
 
     // ==========================================
-    // 12. NOTICE BOARD
+    // 12. NOTICE BOARD CONTROLLER
     // ==========================================
     function fetchNotice() {
       const noticeBanner = document.getElementById('noticeBanner');
