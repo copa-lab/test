@@ -47,7 +47,7 @@
           <i class="fa-solid fa-chart-simple text-xs"></i> <span>मार्क्स & प्रोफाइल</span>
         </button>
         <div id="authContainer">
-          <button onclick="openAuthModal('login')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
+          <button onclick="openAuthModal('studentLogin')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
             लॉगिन / रजिस्टर
           </button>
         </div>
@@ -674,7 +674,6 @@
       }
 
       try {
-        // Cache bypass ke liye timestamp parameter jodein (?t=...)
         const freshUrl = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
         const res = await fetch(freshUrl);
         const data = await res.json();
@@ -685,7 +684,6 @@
             localStorage.setItem('copa_students', JSON.stringify(liveStudents));
           }
           if (Array.isArray(data.tests)) {
-            // Live Sheet se aaya lock status hi primary rahega
             liveTests = data.tests;
             localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
           }
@@ -1014,11 +1012,12 @@
     }
 
     // ==========================================
-    // 7. RENDER TESTS
+    // 7. RENDER HOME TESTS
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
       const countBadge = document.getElementById('testCountBadge');
+      if (!grid) return;
       grid.innerHTML = "";
 
       countBadge.innerText = `${liveTests.length} टेस्ट उपलब्ध`;
@@ -1040,10 +1039,14 @@
         ? String(currentUser.mobile || '').replace(/['\s]/g, '').trim() 
         : null;
 
-      liveTests.forEach(test => {
+      liveTests.forEach((test, index) => {
         const testTopic = String(test.topic || '').trim().toLowerCase();
         const testTitle = String(test.title || '').trim().toLowerCase();
-        const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES" || String(test.isLocked).toUpperCase() === "TRUE";
+        const testKey = encodeURIComponent(test.id || test.title || index);
+
+        const isLocked = test.isLocked === true || 
+                         String(test.isLocked).toUpperCase() === "YES" || 
+                         String(test.isLocked).toUpperCase() === "TRUE";
 
         const isAttempted = currentMobile ? liveResults.some(r => {
           const rMobile = String(r.mobile || '').replace(/['\s]/g, '').trim();
@@ -1085,11 +1088,11 @@
                 <i class="fa-solid fa-lock"></i> लॉक है
               </button>
             ` : (isAttempted ? `
-              <button onclick="promptStartExam('${test.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <button onclick="promptStartExam(decodeURIComponent('${testKey}'), true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-arrows-rotate"></i> दोबारा अभ्यास करने के लिए शुरू करें
               </button>
             ` : `
-              <button onclick="promptStartExam('${test.id}', false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <button onclick="promptStartExam(decodeURIComponent('${testKey}'), false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-play"></i> टेस्ट दें
               </button>
             `)}
@@ -1100,15 +1103,16 @@
     }
 
     // ==========================================
-    // 8. CBT TEST ENGINE
+    // 8. CBT TEST ENGINE (CRASH-PROOF START)
     // ==========================================
-    function promptStartExam(testId, isRetest = false) {
+    function promptStartExam(testIdentifier, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
         showToast("कृपया टेस्ट देने से पहले लॉगिन करें", true);
         openAuthModal('studentLogin');
         return;
       }
-      pendingTestId = testId;
+
+      pendingTestId = String(testIdentifier).trim();
 
       const dynamicText = document.getElementById('warningModalDynamicText');
       if (isRetest) {
@@ -1121,73 +1125,108 @@
         `;
       }
 
-      document.getElementById('examWarningModal').classList.remove('hidden');
+      const modal = document.getElementById('examWarningModal');
+      if (modal) modal.classList.remove('hidden');
     }
 
     function closeExamWarningModal() {
-      document.getElementById('examWarningModal').classList.add('hidden');
-      pendingTestId = null;
+      const modal = document.getElementById('examWarningModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function proceedToExam() {
       closeExamWarningModal();
-      if (pendingTestId) {
+      if (pendingTestId !== null && pendingTestId !== undefined && pendingTestId !== "") {
         startTest(pendingTestId);
+      } else {
+        showToast("टेस्ट आईडी नहीं मिली!", true);
       }
     }
 
-    function startTest(testId) {
-      activeTest = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
-                   liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
+    function startTest(testIdentifier) {
+      try {
+        const query = String(testIdentifier).trim().toLowerCase();
 
-      if (!activeTest) {
-        showToast("यह टेस्ट डेटाबेस में नहीं मिला!", true);
-        return;
+        activeTest = liveTests.find(t => String(t.id).trim().toLowerCase() === query) ||
+                     liveTests.find(t => String(t.title).trim().toLowerCase() === query) ||
+                     liveTests.find(t => String(t.topic).trim().toLowerCase() === query) ||
+                     liveTests[parseInt(testIdentifier)];
+
+        if (!activeTest) {
+          showToast("यह टेस्ट डेटाबेस में नहीं मिला!", true);
+          return;
+        }
+
+        const isLocked = activeTest.isLocked === true || 
+                         String(activeTest.isLocked).toUpperCase() === "YES" || 
+                         String(activeTest.isLocked).toUpperCase() === "TRUE";
+
+        if (isLocked) {
+          showToast("यह टेस्ट एडमिन द्वारा लॉक कर दिया गया है!", true);
+          return;
+        }
+
+        let parsedQuestions = activeTest.questions;
+        if (typeof parsedQuestions === 'string') {
+          try { parsedQuestions = JSON.parse(parsedQuestions); } catch (e) {}
+        }
+
+        if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
+          showToast("इस टेस्ट में कोई प्रश्न नहीं मिले!", true);
+          return;
+        }
+
+        isTestRunning = true;
+        currentQIndex = 0;
+        userAnswers = {};
+        remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
+
+        let rawQuestions = parsedQuestions.map((qObj) => {
+          let questionText = qObj.q || qObj.question || qObj.Question || "प्रश्न लोड नहीं हो सका";
+          
+          let opts = [];
+          if (Array.isArray(qObj.options) && qObj.options.length > 0) {
+            opts = qObj.options;
+          } else {
+            opts = [qObj.OptionA || qObj.optA, qObj.OptionB || qObj.optB, qObj.OptionC || qObj.optC, qObj.OptionD || qObj.optD].filter(Boolean);
+          }
+          if (opts.length === 0) opts = ["Option A", "Option B", "Option C", "Option D"];
+
+          let correctAns = 0;
+          if (typeof qObj.ans === 'number') correctAns = qObj.ans;
+          else if (typeof qObj.ans === 'string') {
+            let a = qObj.ans.trim().toUpperCase();
+            if (a === 'B' || a === '1') correctAns = 1;
+            else if (a === 'C' || a === '2') correctAns = 2;
+            else if (a === 'D' || a === '3') correctAns = 3;
+            else correctAns = 0;
+          }
+
+          let mappedOptions = opts.map((optText, origOptIdx) => ({
+            text: String(optText || ""),
+            originalIndex: origOptIdx
+          }));
+
+          return {
+            q: questionText,
+            originalCorrectAns: correctAns,
+            shuffledOptions: shuffleArray(mappedOptions)
+          };
+        });
+
+        shuffledExamQuestions = shuffleArray(rawQuestions);
+
+        document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
+        document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
+
+        switchView('test');
+        renderCurrentQuestion();
+        startTimer();
+
+      } catch (err) {
+        console.error("Start Test Error:", err);
+        showToast("टेस्ट शुरू करने में त्रुटि हुई!", true);
       }
-
-      const isLocked = activeTest.isLocked === true || String(activeTest.isLocked).toUpperCase() === "YES" || String(activeTest.isLocked).toUpperCase() === "TRUE";
-      if (isLocked) {
-        showToast("यह टेस्ट एडमिन द्वारा लॉक कर दिया गया है!", true);
-        return;
-      }
-
-      let parsedQuestions = activeTest.questions;
-      if (typeof parsedQuestions === 'string') {
-        try { parsedQuestions = JSON.parse(parsedQuestions); } catch (e) {}
-      }
-
-      if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
-        showToast("इस टेस्ट में कोई प्रश्न नहीं मिले!", true);
-        return;
-      }
-
-      isTestRunning = true;
-      currentQIndex = 0;
-      userAnswers = {};
-      remainingSeconds = (parseInt(activeTest.duration) || 10) * 60;
-
-      let rawQuestions = parsedQuestions.map((qObj) => {
-        let opts = Array.isArray(qObj.options) ? qObj.options : ["A", "B", "C", "D"];
-        let mappedOptions = opts.map((optText, origOptIdx) => ({
-          text: optText,
-          originalIndex: origOptIdx
-        }));
-
-        return {
-          q: qObj.q || "प्रश्न लोड नहीं हो सका",
-          originalCorrectAns: typeof qObj.ans === 'number' ? qObj.ans : 0,
-          shuffledOptions: shuffleArray(mappedOptions)
-        };
-      });
-
-      shuffledExamQuestions = shuffleArray(rawQuestions);
-
-      document.getElementById('cbtTestTopic').innerText = activeTest.topic || "COPA";
-      document.getElementById('cbtTestTitle').innerText = activeTest.title || "Mock Test";
-
-      switchView('test');
-      renderCurrentQuestion();
-      startTimer();
     }
 
     function startTimer() {
@@ -1411,7 +1450,7 @@
     }
 
     // ==========================================
-    // 10. ADMIN DASHBOARD (LOCK & UNLOCK LOGIC)
+    // 10. ADMIN DASHBOARD
     // ==========================================
     function showAdminTab(tab) {
       ['adminMatrixTab', 'adminTestControlTab', 'adminAddTestTab', 'adminNoticeTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1489,17 +1528,13 @@
         localStorage.setItem('copa_custom_tests', JSON.stringify(liveTests));
         renderAdminTestControls();
         renderHomeTests();
-        showToast(newStatus ? "टेस्ट लॉक (बंद) कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
+        showToast(newStatus ? "टेस्ट लॉक कर दिया गया!" : "टेस्ट अनलॉक (चालू) कर दिया गया!");
 
-        // Google Sheet me update bhejna
-        await postToGoogleSheet({
+        postToGoogleSheet({
           action: 'toggleTestLock',
           testId: target.id,
           isLocked: newStatus
         });
-
-        // 1 second baad sheet se fresh sync confirm karna
-        setTimeout(refreshDataFromSheet, 1200);
       }
     }
 
