@@ -999,12 +999,17 @@
         return;
       }
 
-      // Convert Google Docs URL to Embeddable Link
       let embedUrl = rawUrl;
 
-      // Agar document/d/ format hai toh /preview use karein
-      if (rawUrl.includes('/document/d/') && !rawUrl.includes('/pub')) {
-        embedUrl = rawUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
+      // 1. Agar Publish to web wala link hai (/pub)
+      if (embedUrl.includes('/pub')) {
+        if (!embedUrl.includes('embedded=true')) {
+          embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'embedded=true';
+        }
+      } 
+      // 2. Agar standard share link hai (/document/d/)
+      else if (embedUrl.includes('/document/d/')) {
+        embedUrl = embedUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
         if (!embedUrl.endsWith('/preview')) {
           embedUrl = embedUrl.replace(/\/$/, '') + '/preview';
         }
