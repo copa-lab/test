@@ -609,8 +609,17 @@
     // ==========================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
-    // Google Doc Preview Link (Fallback)
-    let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "";
+    // Auto-Cache Version Check (Increments automatically clear any bad cached URLs across student browsers)
+    const APP_CACHE_VERSION = "v3_embed_fix";
+    const VERIFIED_DOC_URL = "https://docs.google.com/document/d/e/2PACX-1vQsWzs42iCD85vC2GmEAY73TUMFTV8jJDIRBtlLWgEXn2lE1xzyvhDCA5SoHpX1SA/pub?embedded=true";
+
+    // Automatic purge of outdated local cached practical doc link
+    if (localStorage.getItem('copa_app_cache_version') !== APP_CACHE_VERSION) {
+      localStorage.removeItem('copa_practical_doc');
+      localStorage.setItem('copa_app_cache_version', APP_CACHE_VERSION);
+    }
+
+    let practicalDocUrl = localStorage.getItem('copa_practical_doc') || VERIFIED_DOC_URL;
 
     let liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
     let liveTests = JSON.parse(localStorage.getItem('copa_custom_tests') || '[]');
@@ -662,7 +671,7 @@
     }
 
     // ==========================================
-    // 2. LIVE SYNC
+    // 2. LIVE SYNC (CACHE BUSTING)
     // ==========================================
     async function refreshDataFromSheet() {
       const spinner = document.getElementById('syncSpinner');
@@ -697,8 +706,11 @@
             localStorage.setItem('copa_notice', JSON.stringify(liveNotice));
           }
           if (data.practicalDocUrl) {
-            practicalDocUrl = data.practicalDocUrl;
-            localStorage.setItem('copa_practical_doc', practicalDocUrl);
+            let cleanUrl = String(data.practicalDocUrl).trim();
+            if (cleanUrl) {
+              practicalDocUrl = cleanUrl;
+              localStorage.setItem('copa_practical_doc', practicalDocUrl);
+            }
           }
         }
       } catch (err) {
@@ -982,32 +994,27 @@
     }
 
     // ==========================================
-    // 6. PRACTICAL LAB (GOOGLE DOCS AUTO EMBED FIX)
+    // 6. PRACTICAL LAB (EMBED FIX)
     // ==========================================
     function loadPracticalDoc() {
       const frame = document.getElementById('practicalDocFrame');
       const extBtn = document.getElementById('openDocExternalBtn');
       const input = document.getElementById('adminDocUrlInput');
 
-      let rawUrl = (practicalDocUrl || "").trim();
+      let rawUrl = (localStorage.getItem('copa_practical_doc') || practicalDocUrl || VERIFIED_DOC_URL).trim();
 
       if (input) input.value = rawUrl;
-      if (extBtn) extBtn.href = rawUrl || "#";
-
-      if (!rawUrl) {
-        if (frame) frame.src = "about:blank";
-        return;
-      }
+      if (extBtn) extBtn.href = rawUrl;
 
       let embedUrl = rawUrl;
 
-      // 1. Agar Publish to web wala link hai (/pub)
+      // Ensure Publish to web URLs carry embedded=true parameter
       if (embedUrl.includes('/pub')) {
         if (!embedUrl.includes('embedded=true')) {
           embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'embedded=true';
         }
       } 
-      // 2. Agar standard share link hai (/document/d/)
+      // Ensure regular share links are converted to preview cleanly
       else if (embedUrl.includes('/document/d/')) {
         embedUrl = embedUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
         if (!embedUrl.endsWith('/preview')) {
@@ -1015,7 +1022,9 @@
         }
       }
 
-      if (frame) frame.src = embedUrl;
+      if (frame && frame.src !== embedUrl) {
+        frame.src = embedUrl;
+      }
     }
 
     async function handleSaveDocUrl(e) {
@@ -1032,7 +1041,7 @@
     }
 
     // ==========================================
-    // 7. RENDER HOME TESTS (INDEX BASED - ZERO BUG)
+    // 7. RENDER HOME TESTS (INDEX-BASED TRIGGER)
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -1122,7 +1131,7 @@
     }
 
     // ==========================================
-    // 8. CBT TEST ENGINE (ROBUST & RELIABLE)
+    // 8. CBT TEST ENGINE (ZERO CRASH INDEX LAUNCH)
     // ==========================================
     function promptStartExam(testIdx, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
