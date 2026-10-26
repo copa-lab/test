@@ -114,10 +114,10 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs text-slate-600 font-medium">
           <span class="flex items-center gap-1.5"><i class="fa-solid fa-file-word text-blue-600"></i> Google Docs Viewer</span>
-          <span class="text-[11px] text-slate-400">दस्तावेज़ सीधे Google सर्वर से लोड हो रहा है</span>
+          <span class="text-[11px] text-slate-400">दस्तावेज़ सीधे लोड हो रहा है</span>
         </div>
-        <div class="w-full h-[650px] bg-slate-50">
-          <iframe id="practicalDocFrame" src="" class="w-full h-full border-0" allow="autoplay"></iframe>
+        <div class="w-full h-[650px] bg-slate-50 relative">
+          <iframe id="practicalDocFrame" src="" class="w-full h-full border-0"></iframe>
         </div>
       </div>
     </section>
@@ -447,11 +447,11 @@
           <h3 class="font-bold text-slate-800 text-base mb-2 flex items-center gap-2">
             <i class="fa-solid fa-file-word text-blue-600"></i> प्रैक्टिकल Google Doc लिंक कंट्रोल
           </h3>
-          <p class="text-xs text-slate-500 mb-4">Google Docs का 'Anyone with the link can view' वाला शेयर लिंक यहाँ डालें।</p>
+          <p class="text-xs text-slate-500 mb-4">Google Docs का लिंक यहाँ डालें।</p>
           <form onsubmit="handleSaveDocUrl(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Docs URL</label>
-              <input type="url" id="adminDocUrlInput" required placeholder="https://docs.google.com/document/d/.../preview" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+              <input type="url" id="adminDocUrlInput" required placeholder="Google Doc URL यहाँ डालें" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
             </div>
             <button type="submit" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition">
               Google Doc लिंक सुरक्षित करें
@@ -609,6 +609,7 @@
     // ==========================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7qjAP2vfuTyI7QXOSQcV26XIHS-0IbrF308NoA3poUDMRkxw1fHbQOeLXMBt7UrH7/exec";
 
+    // Google Doc Preview Link (Fallback)
     let practicalDocUrl = localStorage.getItem('copa_practical_doc') || "";
 
     let liveStudents = JSON.parse(localStorage.getItem('copa_students') || '[]');
@@ -618,7 +619,7 @@
 
     let currentUser = null;
     let activeTest = null;
-    let pendingTestId = null;
+    let pendingTestIndex = null;
     let isTestRunning = false;
     let currentQIndex = 0;
     let userAnswers = {};
@@ -792,7 +793,7 @@
     }
 
     // ==========================================
-    // 5. AUTHENTICATION & LOGIN POPUP
+    // 5. AUTHENTICATION
     // ==========================================
     function loadSavedSession() {
       const session = localStorage.getItem('copa_session');
@@ -981,21 +982,35 @@
     }
 
     // ==========================================
-    // 6. PRACTICAL LAB (GOOGLE DOCS)
+    // 6. PRACTICAL LAB (GOOGLE DOCS AUTO EMBED FIX)
     // ==========================================
     function loadPracticalDoc() {
       const frame = document.getElementById('practicalDocFrame');
       const extBtn = document.getElementById('openDocExternalBtn');
       const input = document.getElementById('adminDocUrlInput');
 
-      let embedUrl = practicalDocUrl || "";
-      if (embedUrl.includes('/document/d/') && !embedUrl.includes('/preview') && !embedUrl.includes('/pub')) {
-        embedUrl = embedUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
+      let rawUrl = (practicalDocUrl || "").trim();
+
+      if (input) input.value = rawUrl;
+      if (extBtn) extBtn.href = rawUrl || "#";
+
+      if (!rawUrl) {
+        if (frame) frame.src = "about:blank";
+        return;
+      }
+
+      // Convert Google Docs URL to Embeddable Link
+      let embedUrl = rawUrl;
+
+      // Agar document/d/ format hai toh /preview use karein
+      if (rawUrl.includes('/document/d/') && !rawUrl.includes('/pub')) {
+        embedUrl = rawUrl.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview');
+        if (!embedUrl.endsWith('/preview')) {
+          embedUrl = embedUrl.replace(/\/$/, '') + '/preview';
+        }
       }
 
       if (frame) frame.src = embedUrl;
-      if (extBtn) extBtn.href = practicalDocUrl || "#";
-      if (input) input.value = practicalDocUrl || "";
     }
 
     async function handleSaveDocUrl(e) {
@@ -1012,7 +1027,7 @@
     }
 
     // ==========================================
-    // 7. RENDER HOME TESTS
+    // 7. RENDER HOME TESTS (INDEX BASED - ZERO BUG)
     // ==========================================
     function renderHomeTests() {
       const grid = document.getElementById('testGrid');
@@ -1042,7 +1057,6 @@
       liveTests.forEach((test, index) => {
         const testTopic = String(test.topic || '').trim().toLowerCase();
         const testTitle = String(test.title || '').trim().toLowerCase();
-        const testKey = encodeURIComponent(test.id || test.title || index);
 
         const isLocked = test.isLocked === true || 
                          String(test.isLocked).toUpperCase() === "YES" || 
@@ -1088,11 +1102,11 @@
                 <i class="fa-solid fa-lock"></i> लॉक है
               </button>
             ` : (isAttempted ? `
-              <button onclick="promptStartExam(decodeURIComponent('${testKey}'), true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <button onclick="promptStartExam(${index}, true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-arrows-rotate"></i> दोबारा अभ्यास करने के लिए शुरू करें
               </button>
             ` : `
-              <button onclick="promptStartExam(decodeURIComponent('${testKey}'), false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <button onclick="promptStartExam(${index}, false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-play"></i> टेस्ट दें
               </button>
             `)}
@@ -1103,16 +1117,16 @@
     }
 
     // ==========================================
-    // 8. CBT TEST ENGINE (CRASH-PROOF START)
+    // 8. CBT TEST ENGINE (ROBUST & RELIABLE)
     // ==========================================
-    function promptStartExam(testIdentifier, isRetest = false) {
+    function promptStartExam(testIdx, isRetest = false) {
       if (!currentUser || currentUser.role !== 'student') {
         showToast("कृपया टेस्ट देने से पहले लॉगिन करें", true);
         openAuthModal('studentLogin');
         return;
       }
 
-      pendingTestId = String(testIdentifier).trim();
+      pendingTestIndex = parseInt(testIdx);
 
       const dynamicText = document.getElementById('warningModalDynamicText');
       if (isRetest) {
@@ -1136,21 +1150,16 @@
 
     function proceedToExam() {
       closeExamWarningModal();
-      if (pendingTestId !== null && pendingTestId !== undefined && pendingTestId !== "") {
-        startTest(pendingTestId);
+      if (pendingTestIndex !== null && !isNaN(pendingTestIndex)) {
+        startTestByIndex(pendingTestIndex);
       } else {
-        showToast("टेस्ट आईडी नहीं मिली!", true);
+        showToast("टेस्ट लोड नहीं हो सका!", true);
       }
     }
 
-    function startTest(testIdentifier) {
+    function startTestByIndex(index) {
       try {
-        const query = String(testIdentifier).trim().toLowerCase();
-
-        activeTest = liveTests.find(t => String(t.id).trim().toLowerCase() === query) ||
-                     liveTests.find(t => String(t.title).trim().toLowerCase() === query) ||
-                     liveTests.find(t => String(t.topic).trim().toLowerCase() === query) ||
-                     liveTests[parseInt(testIdentifier)];
+        activeTest = liveTests[index];
 
         if (!activeTest) {
           showToast("यह टेस्ट डेटाबेस में नहीं मिला!", true);
@@ -1222,6 +1231,8 @@
         switchView('test');
         renderCurrentQuestion();
         startTimer();
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
       } catch (err) {
         console.error("Start Test Error:", err);
@@ -1489,7 +1500,7 @@
         return;
       }
 
-      liveTests.forEach(test => {
+      liveTests.forEach((test, idx) => {
         const isLocked = test.isLocked === true || String(test.isLocked).toUpperCase() === "YES" || String(test.isLocked).toUpperCase() === "TRUE";
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50";
@@ -1505,7 +1516,7 @@
             </span>
           </td>
           <td class="p-3.5 text-center">
-            <button onclick="toggleTestStatus('${test.id}', ${!isLocked})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm ${
+            <button onclick="toggleTestStatusByIndex(${idx}, ${!isLocked})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm ${
               isLocked 
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
                 : 'bg-rose-600 hover:bg-rose-700 text-white'
@@ -1519,9 +1530,8 @@
       });
     }
 
-    async function toggleTestStatus(testId, newStatus) {
-      const target = liveTests.find(t => String(t.id).trim() === String(testId).trim()) ||
-                     liveTests.find(t => String(t.title).trim().toLowerCase() === String(testId).trim().toLowerCase());
+    async function toggleTestStatusByIndex(index, newStatus) {
+      const target = liveTests[index];
 
       if (target) {
         target.isLocked = newStatus;
@@ -1532,7 +1542,7 @@
 
         postToGoogleSheet({
           action: 'toggleTestLock',
-          testId: target.id,
+          testId: target.id || target.title,
           isLocked: newStatus
         });
       }
